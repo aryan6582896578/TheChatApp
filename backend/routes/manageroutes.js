@@ -43,13 +43,13 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
           let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
           const cldRes = await uploadImage(dataURI);
           console.log(cldRes)
-          
           await userDataModel.findOneAndUpdate({
             userid:`${req.userId}`
           },{
             userprofileurl:`${cldRes.url}`
           })
           socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
+          console.log("pfp updated")
           res.json({status:"updated"});
   } catch (error) {
     console.log(error);

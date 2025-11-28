@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { getJwtCookie, socket } from "../managesocket";
+// import { getJwtCookie, socket } from "../managesocket";
 import axios from "axios";
 
 
@@ -100,26 +100,26 @@ export function ChatBoxComponent() {
     getUserData()
     getMessage()
     
-    const jwtToken = getJwtCookie();
-    const serverId = parms.serverId;
-    const channelId = parms.channelId;
+    // const jwtToken = getJwtCookie();
+    // const serverId = parms.serverId;
+    // const channelId = parms.channelId;
     // socket.emit("joinServer", { jwtToken,serverId,channelId},()=>{
     //   socket.on(`${serverId}/${channelId}`,async (messageData)=>{
     //     console.log(messageData)
     //     setdisplayMessageSocket(a=>[...a,messageData])    
     //   })
     // });
-    socket.emit("joinServer", { jwtToken,serverId,channelId});
-    socket.on(`${serverId}/${channelId}`,async (messageData)=>{
-      console.log(messageData)
-      setdisplayMessageSocket(a=>[...a,messageData])    
-    })
+    // socket.emit("joinServer", { jwtToken,serverId,channelId});
+    // socket.on(`${serverId}/${channelId}`,async (messageData)=>{
+    //   console.log(messageData)
+    //   setdisplayMessageSocket(a=>[...a,messageData])    
+    // })
     // socket.emit("test");
     // socket.on("testserver",async (x)=>{
     // console.log(x)  
     // })
     return () => {
-      socket.off(`${parms.serverId}/${parms.channelId}`);
+      // socket.off(`${parms.serverId}/${parms.channelId}`);
       setdisplayMessageSocket([])
       setdisplayMessageDb([])
     }
@@ -127,8 +127,8 @@ export function ChatBoxComponent() {
 
 
   return (
-    <div className="bg-purple-500 w-[100%] flex flex-col flex-1 relative overflow-hidden">
-          <div className="bg-primaryColor flex-1 break-all overflow-y-scroll flex flex-col h-[100%]" ref={chatDiv} onScroll={(e)=>{if(e.target.scrollTop===0){settopReached(true) }}}>
+    <div className="bg-primaryColor w-full h-full flex flex-col relative">
+          {/* <div className="bg-primaryColor flex-1 break-all overflow-y-scroll flex flex-col h-[100%]" ref={chatDiv} onScroll={(e)=>{if(e.target.scrollTop===0){settopReached(true) }}}>
           <div ref={chatDivTop}></div>
           
           {displayMessageDb?.map((data,x)=>{
@@ -146,10 +146,10 @@ export function ChatBoxComponent() {
                 return(
                   <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer ">
  
-                    {/* <div className="font-medium text-[20px] flex" >
+                    <div className="font-medium text-[20px] flex" >
                        <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] mr-[10px] " alt="pfp"/>
                       {data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{data.date}</span></div>
-                    <div className="text-otherColor text-opacity-[80%]">{data.message}</div> */}
+                    <div className="text-otherColor text-opacity-[80%]">{data.message}</div>
 
                     <div className="flex w-[100%] h-[70px]">
                       <div className="">
@@ -169,10 +169,48 @@ export function ChatBoxComponent() {
           
           <div ref={chatDivBottom}></div>
 
-        </div>
+        </div> */}
 
-        <div className="min-h-[55px] overflow-hidden bg-primaryColor flex">
-        <div contentEditable className="w-[100%] h-[70%] ml-[10px] mt-auto mb-auto rounded-[5px] bg-otherColor/9 outline-none p-[5px]"  onKeyDown={sendMessage} spellCheck={true}  onInput={(e) => {
+
+      <div className=" flex flex-col absolute w-[100%] overflow-y-scroll bottom-[55px] top-[0]">
+          {displayMessageDb?.map((data,x)=>{
+                return( 
+                  <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer" >
+                                
+                    <div className="font-medium text-textColor text-[20px]" >{displayMessageDb[x].username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{displayMessageDb[x].displayDate}</span></div>
+                    <div className="text-otherColor text-opacity-[80%] break-before-column">{displayMessageDb[x].message}</div>
+                  </div>
+                )
+              })}
+           {displayMessageSocket?.map((data,x)=>{
+                return(
+                  <div key={x} className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer ">
+ 
+                    <div className="font-medium text-[20px] flex" >
+                       <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] mr-[10px] " alt="pfp"/>
+                      {data.username}<span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">{data.date}</span></div>
+                    <div className="text-otherColor text-opacity-[80%]">{data.message}</div>
+
+                    <div className="flex w-[100%] h-[70px]">
+                      <div className="">
+                        <img src={data.userprofileurl} className="w-[40px] h-[40px] rounded-[100%] m-[5px] flex " alt="pfp"/>
+                      </div>
+                      <div className="w-[100%]">
+                        <div className="font-medium text-[20px] flex ml-[5px]" >
+                          {data.username}<span className="text-otherColor/50 font-normal text-[10px]  ml-[10px] mt-[10px]">{data.date}</span>
+                        </div>
+                        <div className="text-otherColor mt-[5px]">{data.message}</div>
+                      </div>
+                    </div>
+                    
+                  </div>
+                )
+              })} 
+      </div>
+
+
+        <div className="min-h-[55px] max-h-[55px] overflow-hidden bg-primaryColor flex w-[100%] absolute bottom-0">
+        <div contentEditable className="w-[100%] h-[70%] ml-[10px] mt-auto mb-auto rounded-[5px] bg-otherColor/9 outline-none p-[5px] text-otherColor"  onKeyDown={sendMessage} spellCheck={true}  onInput={(e) => {
                     setmessageData(e.target.innerText);         
               }}/>
         {scrollDown?<button className=" bg-purple-500 h-[70%] mt-auto mb-auto w-[5px] rounded-[10px] hover:bg-purple-600 mr-[5px] ml-[5px]" onClick={scrollBottom}/>:""}  
@@ -180,4 +218,8 @@ export function ChatBoxComponent() {
     </div>
 
   );
+
+
+
+
 }

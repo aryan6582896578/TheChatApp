@@ -11,12 +11,13 @@
     "front": "vite"
   },
   "dependencies": {
-  
+    "@tailwindcss/vite": "^4.1.16",
     "axios": "^1.8.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.5.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

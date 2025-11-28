@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import axios from "axios";
 import ServerError from "../otherComponents/ServerErrorPage";
+import { getJwtCookie, socket } from "../managesocket";
 export default function AuthCheckMain() {
   const navigate = useNavigate();
   const [userStatus, setuserStatus] = useState(false);
@@ -12,6 +13,11 @@ export default function AuthCheckMain() {
     })
     if(userData.data.status === "userValid"){
       setuserStatus(true);
+      const jwtToken = getJwtCookie();
+      socket.emit("joinUserUpdates",{jwtToken});
+      socket.on(userInfo,(x)=>{
+        console.log("yess",x);
+      })
     }else{
       navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);
     }
@@ -19,7 +25,7 @@ export default function AuthCheckMain() {
 
   useEffect(() => {
     verifyUser()
-
+    console.log(socket.connected)
   }, []);
 
   if(userStatus){

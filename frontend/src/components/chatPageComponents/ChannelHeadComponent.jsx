@@ -25,7 +25,7 @@ export default function ChannelHeadComponent({setmemberListDisplay,memberListDis
     }, [parms.serverId,parms.channelId])
     document.title =`#${channelName} | ${import.meta.env.VITE_NAME}`
     return(
-        <div className="bg-primaryColor text-otherColor w-[100%] min-h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] flex relative">
+        <div className="bg-primaryColor text-otherColor w-[100%] min-h-[45px] h-[45px] border-solid border-b-[1px] border-secondaryColor font-medium text-[30px] pl-[20px] flex relative">
             <span className="hover:text-otherColor duration-[0.5s]" onClick={()=>{setserverListDisplay("flex"),setchannelListDisplay("flex"),setchatBoxDisplay("hidden"),setuserSettingDisplay("hidden"),setbottomBarDisplay(true) }}> # {channelName} </span>
             <button className="absolute end-0 text-[20px] h-[100%] pl-[15px] pr-[15px] rounded-[5px] cursor-pointer hover:bg-otherColor/10 " onClick={()=>{setmemberListDisplay(memberListDisplay?false:true) ,setmemberListSMDisplay("block")}}>
             <img src={memberListIcon} alt="memberListIcon" />

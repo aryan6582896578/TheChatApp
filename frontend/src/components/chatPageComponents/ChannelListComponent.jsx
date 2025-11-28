@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useEffectEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
-export default function ChannelListComponent({setchatBoxDisplay,setserverListDisplay,setchannelListDisplay,setbottomBarDisplay}){
+export default function ChannelListComponent(){
     const navigate = useNavigate();
     const parms = useParams();
     const[serverId,setserverId]=useState("")
@@ -67,10 +67,6 @@ export default function ChannelListComponent({setchatBoxDisplay,setserverListDis
                   return (
                     <button key={x} className={`flex text-[20px] m-[5px] ml-[1px] rounded-[5px] mb-[5px] p-[5px] pl-0 pr-0 font-medium text-otherColor/90 ${channelId[x]===parms.channelId?"bg-otherColor/5":""} hover:text-otherColor  hover:bg-otherColor/5 overflow-clip cursor-pointer`} onClick={()=>{
                      navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${serverId}/${channelId[x]}`)
-                     setchatBoxDisplay("flex")
-                     setserverListDisplay("hidden")
-                     setchannelListDisplay("hidden")
-                     setbottomBarDisplay(false)
                     }}> <span className="ml-[10px] mr-[10px] text-otherColor/60 ">#</span>{channelName} </button>
                   )
                 })}
