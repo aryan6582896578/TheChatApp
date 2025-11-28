@@ -1,13 +1,21 @@
-cd frontend
-npm run front
+# TheChatApp
 
-cd backend
-npm run server
+> ### Backend TODO
+```
+fix message storage socket logic
+redis
+send server name in render list
+check auth logic
+password/username/pfp change
+server change
+add friends system
+private message
+voip in server / dms
+fix jwt logic 2+ valid jwt will be active for password change or username or userprofile use redis to cache timestamp and prevent db hit on every api  
+```
 
-
-TODO
-upload user pfp  edit profile
-cache everything redis
-message cache batch upload 
-fix scroll
-ui better 
+> ### frontend TODO
+```
+fix ui
+create event bus
+```
