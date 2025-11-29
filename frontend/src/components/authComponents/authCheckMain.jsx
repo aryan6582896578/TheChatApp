@@ -15,9 +15,9 @@ export default function AuthCheckMain() {
       setuserStatus(true);
       const jwtToken = getJwtCookie();
       socket.emit("joinUserUpdates",{jwtToken});
-      socket.on(userInfo,(x)=>{
-        console.log("yess",x);
-      })
+      // socket.on(userInfo,(x)=>{
+      //   console.log("yess",x);
+      // })
     }else{
       navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);
     }

@@ -6,7 +6,16 @@ import { createCustomId } from "./managedata/customData.js";
 async function userDataSeverList(username) {
     const userDataSeverList = await userDataModel.findOne({username:username})
     if(userDataSeverList){
-        return userDataSeverList.servers
+        const serverData = await Promise.all(
+        userDataSeverList.servers.map(serverId =>
+            getServerData(serverId)
+        ));
+
+        const serverList = {};
+        for(const x in serverData){
+            serverList[serverData[x].serverId]=serverData[x].name
+        }
+        return serverList
     } 
 }
 

@@ -4,7 +4,7 @@ import axios from "axios";
 export function ServerListComponent() {
   const navigate = useNavigate();
   const parms = useParams()
-  const [serverList, setserverList] = useState([]);
+  const [serverList, setserverList] = useState(null);
   const[username,setusername]=useState("");
   const [serverBoxDisplay ,setserverBoxDisplay] = useState(false);
   const [disableServerCreateButton,setdisableServerCreateButton] =useState("")
@@ -84,24 +84,29 @@ export function ServerListComponent() {
   },[parms.serverId,parms.channelId]);
 
   return (
-    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor overflow-y-auto overflow-x-hidden relative border-solid border-r-[1px] border-secondaryColor z-[10]">
+    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor relative border-solid border-r-[1px] border-secondaryColor z-[10]">
 
       <div className="flex">
         <button onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`);
           }}
-          className="min-w-[5px] min-h-[30px] bg-textColor mt-[15px] hover:cursor-pointer hover:bg-otherColor  ml-auto mr-auto rounded-[10%] duration-500"
+          className="min-w-[5px] min-h-[40px] bg-textColor mt-[15px] cursor-pointer hover:bg-otherColor duration-500 ml-auto mr-auto "
         />
       </div>
 
-      <div className="flex flex-col relative pt-[20px]">
-        {serverList?.map((server, index) => (
-          <div key={index} className="m-auto">
-            <button key={index} onClick={() => {
-                navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${server}`);
-              }}
-              className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor/50  hover:text-otherColor/90 duration-[0.5s] cursor-pointer"
-            >{index}</button>
+      <div className="flex flex-col  pt-[20px] ">
+        {Object.entries(serverList || {}).map(([serverId, serverName]) => (
+          <div key={serverId} className="m-auto relative group text-otherColor/50">
+            <button onClick={() =>{
+                navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${serverId}`)
+            }}
+              className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px]text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor/50 hover:text-otherColor duration-[0.5s] cursor-pointer">
+              {serverName[0]}
+            </button>
+            <div className="absolute text-textColor left-[55px] top-2 w-fit whitespace-nowrap p-[5px] rounded-[5px] bg-gray-950 text-[15px] font-semibold 
+            opacity-0 group-hover:opacity-100 transition">
+              {serverName}
+            </div>
           </div>
         ))}
 

@@ -4,7 +4,7 @@
 ```
 fix message storage socket logic
 redis
-send server name in render list
+~~send server name in render list~~
 check auth logic
 password/username/pfp change
 server change

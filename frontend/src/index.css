@@ -23,12 +23,11 @@
   background: rgb(238, 238, 238, 50%);
   border-radius: 10px;
 }
-html,
-body {
+
+html, body, #root {
+  background-color: cyan;
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  height: 100%;
-  width: 100%;
-  background-color: #222831;
 }
