@@ -81,7 +81,7 @@ export function ServerSettingComponent() {
   
   
   
-  document.title =`${serverInfo.serverName} | ${import.meta.env.VITE_NAME}`
+  // document.title =`${serverInfo.serverName} | ${import.meta.env.VITE_NAME}`
 
   return (
     <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col text-otherColor">

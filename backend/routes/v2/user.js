@@ -92,12 +92,14 @@ export default function user(app,socket,upload){
       }
     }
   });
+
   router.get("/serverList", checkJwt, async (req, res) => {
     if (req.validUser) {
       const userDataSevers = await userDataSeverList(req.username);
       res.json({ serverList: userDataSevers , username:req.username});
     }
   });
+  
 router.post("/joinServer", checkJwt, async (req, res) => {
     if (req.validUser) {
       const serverInviteCodeJoin = req.body.serverInviteCode;

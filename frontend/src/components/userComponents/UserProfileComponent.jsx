@@ -22,12 +22,9 @@ export function UserProfileComponent() {
     }
     
   }, [])
- useEffect(() => {
-console.log("hmm")
- }, [])
  
     return (
-      <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor hidden sm:flex border-solid border-t-[1px] border-secondaryColor relative">
+      <div className=" min-w-[250px] max-w-[250px] max-h-[55px] min-h-[55px] bg-primaryColor hidden sm:flex border-solid border-t-[1px] border-secondaryColor relative ">
         <div className=" ml-[5px] flex mt-auto mb-auto w-[40px] h-[40px]">
           <img src={userProfileInfo.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] " draggable={false}/>
         </div>

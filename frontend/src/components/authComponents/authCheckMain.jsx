@@ -25,7 +25,7 @@ export default function AuthCheckMain() {
 
   useEffect(() => {
     verifyUser()
-    console.log(socket.connected)
+    console.log(socket.connected ,"socket check")
   }, []);
 
   if(userStatus){

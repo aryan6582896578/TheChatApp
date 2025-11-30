@@ -1,8 +1,9 @@
 import express from "express";
 import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../database/managedata/authData.js";
 import { getChannelName, getServerChannelMemberList, getServerData, getUserData, getUsername, validInviteCode, validServerChannelList } from "../../database/managedata.js";
-import { inviteDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
+import { inviteDataModel, messageDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
+import { channelPermissionCheck } from "./other.js";
 const router = express.Router({ mergeParams: true })
 export default function serverV2(app,socket,upload){
   async function checkJwt(req, res, next) {
@@ -15,6 +16,7 @@ export default function serverV2(app,socket,upload){
           req.validUser = true,
           req.username = usernameValidToken,
           req.userId = userIdValidToken;
+          // console.log("ff jwt ",req.userId)
         } else {
           req.validUser = false;
         }
@@ -39,7 +41,7 @@ export default function serverV2(app,socket,upload){
             })
           );
           const channelNameList = Object.fromEntries(names);
-          return res.json({ channelList: channelNameList });
+          return res.json({ channelList: channelNameList ,status: "validUser" });
         } else {
           res.json({ status: "userInValid" });
         }
@@ -95,7 +97,7 @@ export default function serverV2(app,socket,upload){
           const serverMemberList = serverData.members;
           if (serverMemberList.includes(userId)) {
             const channelName = await getChannelName(channelId);
-            return res.json({ channelName: channelName });
+            return res.json({ channelName: channelName ,serverName:serverData.name });
           } else {
             res.json({ status: "userInValid" });
           }
@@ -171,6 +173,7 @@ export default function serverV2(app,socket,upload){
       }
     }
   });
+
   router.post("/:serverId/createChannel", checkJwt, async (req, res) => {
     const userId = req.userId;
     const serverId = req.params.serverId;
@@ -213,6 +216,33 @@ export default function serverV2(app,socket,upload){
     } else {
       console.log("noo");
       res.json({ status: "invalidData" });
+    }
+  });
+
+
+  router.get('/getmessage/:serverId/:channelId', checkJwt, async (req, res) => {
+    const { lastId } = req.query;
+    const serverId = req.params.serverId;
+    const channelId = req.params.channelId;
+    const userId = req.userId;
+    const authCheck = await channelPermissionCheck(userId,serverId,channelId)
+    if(authCheck==="validUser"){
+      if(lastId!="null"){
+        const getMessages = await messageDataModel.find({
+          channelId:channelId,
+          _id:{$lt :lastId}
+        }).limit(20).sort({_id:-1});
+        res.json({messages:getMessages })
+      }else{
+        const getMessages = await messageDataModel.find({
+          channelId:channelId,
+        }).sort({createdAt:-1}).limit(20)
+        const sendMessage = getMessages.reverse()
+        const lastMessageId = Object.values(getMessages)[0].message
+        res.json({messages:sendMessage , lastMessageId:lastMessageId})
+      }
+    }else{
+      res.json({status:"invalidServer"})
     }
   });
     return router

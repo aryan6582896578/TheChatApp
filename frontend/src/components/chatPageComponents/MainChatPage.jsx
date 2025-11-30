@@ -7,9 +7,11 @@ import { ServerSettingComponent } from "./ServerSettingComponent.jsx";
 import ChannelHeadComponent from "./ChannelHeadComponent.jsx";
 import { ChatBoxComponent } from "./ChatBoxComponent.jsx";
 import { MemberListComponent } from "./MemberListComponent.jsx";
+import { UserProfileComponent } from "../userComponents/UserProfileComponent.jsx";
 
 export default function MainChatPage() {
   const [channelCheck, setchannelCheck] = useState(false);
+  const [displayMemberListComponent,setdisplayMemberListComponent ]=useState(true);
   const navigate = useNavigate();
   const parms = useParams();
 
@@ -19,23 +21,26 @@ export default function MainChatPage() {
       const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/channelList`,{
           withCredentials: true,
         });
-      const data = Object.keys(channelListData.data.channelList);
-      console.log(data)
-      
-      if (parms.channelId) {
-        if (data.includes(parms.channelId)) {
-          setchannelCheck(true);
+      if(channelListData.data.status === "userInValid"){
+        
+        navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`)
+      }else{
+        const data = Object.keys(channelListData.data.channelList);
+        // console.log(data,"ffff")   
+        if (parms.channelId) {
+          if (data.includes(parms.channelId)) {
+            setchannelCheck(true);
+          } else {
+            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);}
         } else {
-          navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);}
-      } else {
-        setchannelCheck(false);
-        if (data[0]) {
-          navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}/${data[0]}`);
-        }else{
-          navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);
+          setchannelCheck(false);
+          if (data[0]) {
+            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}/${data[0]}`);
+          }else{
+            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);
+          }
         }
       }
-
     } catch (error) {
       console.error(error, "error channel switch");
     }
@@ -44,30 +49,27 @@ export default function MainChatPage() {
     getChannelData();
   }, [parms.serverId, parms.channelId]);
 
+  if(channelCheck){ 
   return (
-    <div className="bg-black flex">
-      <div>
-        <ServerListComponent/>
-      </div>
+    <div className="bg-orange-600 flex h-full">
+      <ServerListComponent/>
 
-      <div>
+      <div className="bg-purple-800 flex flex-col">
         <ServerSettingComponent/>
         <ChannelListComponent/>
+        <UserProfileComponent/>
       </div>
 
-      <div className="flex w-[100%] max-h-[50%] flex-col bg-yellow-50">
-
-          <ChannelHeadComponent/>
-
-        <div className="flex w-[100%] h-[100%] relative">
+      <div className="bg-pink-600 h-full flex flex-col w-full">
+        <ChannelHeadComponent setdisplayMemberListComponent={setdisplayMemberListComponent} displayMemberListComponent={displayMemberListComponent}/>
+        <div className="bg-yellow-800 flex h-full">
           <ChatBoxComponent/>
-          <MemberListComponent/>
+          <MemberListComponent displayMemberListComponent={displayMemberListComponent}/>
         </div>
-
       </div>
-
     </div>
-  );
+  )
+  }
 }
 
 

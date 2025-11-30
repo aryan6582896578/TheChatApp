@@ -100,7 +100,7 @@ export function ServerListComponent() {
             <button onClick={() =>{
                 navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${serverId}`)
             }}
-              className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px]text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-textColor/50 hover:text-otherColor duration-[0.5s] cursor-pointer">
+              className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] hover:border-otherColor/50 text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px]  hover:text-otherColor duration-[0.5s] cursor-pointer">
               {serverName[0]}
             </button>
             <div className="absolute text-textColor left-[55px] top-2 w-fit whitespace-nowrap p-[5px] rounded-[5px] bg-gray-950 text-[15px] font-semibold 
