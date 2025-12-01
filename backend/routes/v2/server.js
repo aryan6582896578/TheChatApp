@@ -238,7 +238,7 @@ export default function serverV2(app,socket,upload){
           channelId:channelId,
         }).sort({createdAt:-1}).limit(20)
         const sendMessage = getMessages.reverse()
-        const lastMessageId = Object.values(getMessages)[0].message
+        const lastMessageId = Object.values(getMessages)[0]?.message
         res.json({messages:sendMessage , lastMessageId:lastMessageId})
       }
     }else{

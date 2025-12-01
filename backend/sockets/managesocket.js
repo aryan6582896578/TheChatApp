@@ -5,15 +5,12 @@ import { messageDataModel } from "../database/schema/databaseSchema.js";
 
 export default async function runsocket(io) {
   io.on("connection", (socket) => {
-    // socket.on("test" , async () => {
-      
-    //   await socket.join("testserver");
-    //   console.log("something in test")
-    //   await socket.on("testserver",(y)=>{
-    //     console.log(y,"Ff")
-    //     io.to("testserver").emit("testserver", "hmmmmmm  testserver");
-    //   })
-    // })
+
+   socket.on("testserver",async (y)=>{
+        console.log(y,"Ff")
+        io.to("testserver").emit("testserver", "hmmmmmm  testserver");
+   })
+
     if(socket.handshake.auth.jwtToken){
 
       socket.on("joinServer", async ({  jwtToken,serverId,channelId }) => {

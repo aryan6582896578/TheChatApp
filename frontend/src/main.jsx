@@ -28,7 +28,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
       socket.auth = {jwtToken}
   }
   setSocketData();
+  if (!socket.connected) {
     socket.connect();
+  }
     root.render(
       <BrowserRouter>
         <Routes>

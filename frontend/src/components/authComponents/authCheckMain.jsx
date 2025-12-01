@@ -22,9 +22,11 @@ export default function AuthCheckMain() {
       navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);
     }
   }
-
   useEffect(() => {
     verifyUser()
+    if(!socket.connected){
+      socket.connect();
+    }
     console.log(socket.connected ,"socket check")
   }, []);
 

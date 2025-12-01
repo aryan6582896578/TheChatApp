@@ -7,7 +7,7 @@ export function ServerSettingComponent() {
   const [serverInfo, setserverInfo] = useState({serverName:"Loading...",serverInviteCode:false});
   const [serverSettingDisplay, setserverSettingDisplay] = useState(false);
   const [ adminCheck , setadminCheck] = useState(false)
-  const [ socketConnection , setsocketConnection] = useState(false);
+  const [ socketConnection , setsocketConnection] = useState(true);
 
   async function createServerInvite() {
       const getInviteCode = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/inviteCode`,{
@@ -61,15 +61,15 @@ export function ServerSettingComponent() {
     //     setupdateFromServer(data)
     //   })
 
-    if(socket.connected){
-      setsocketConnection(true)
-    }
-    return ()=>{
-      setadminCheck(false);
-      setserverSettingDisplay(false);
-      // socket.off(`${parms.serverId}`)
-      setsocketConnection(false)
-    }
+    // if(socket.connected){
+    //   setsocketConnection(true)
+    // }
+    // return ()=>{
+    //   setadminCheck(false);
+    //   setserverSettingDisplay(false);
+    //   // socket.off(`${parms.serverId}`)
+    //   setsocketConnection(false)
+    // }
     
   },[parms.serverId]);
 

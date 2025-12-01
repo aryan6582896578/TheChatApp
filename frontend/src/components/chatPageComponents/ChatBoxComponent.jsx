@@ -53,21 +53,11 @@ export function ChatBoxComponent() {
     const jwtToken = getJwtCookie();
     const serverId = parms.serverId;
     const channelId = parms.channelId;
-    socket.emit("joinServer", { jwtToken,serverId,channelId},()=>{
-      socket.on(`${serverId}/${channelId}`,async (messageData)=>{
-        console.log(messageData)
-        setdisplayMessageSocket(a=>[...a,messageData])    
-      })
-    });
     socket.emit("joinServer", { jwtToken,serverId,channelId});
     socket.on(`${serverId}/${channelId}`,async (messageData)=>{
-      console.log(messageData)
-      setdisplayMessageSocket(a=>[...a,messageData])    
+      setdisplayMessageSocket(x=>[...x,messageData])    
     })
-    socket.emit("test");
-    socket.on("testserver",async (x)=>{
-    console.log(x)  
-    })
+
     return () => {
       socket.off(`${parms.serverId}/${parms.channelId}`);
       setdisplayMessageSocket([])
@@ -118,24 +108,6 @@ export function ChatBoxComponent() {
                 {data.message}
               </div>
 
-              <div className="flex w-[100%] h-[70px]">
-                <div className="">
-                  <img
-                    src={data.userprofileurl}
-                    className="w-[40px] h-[40px] rounded-[100%] m-[5px] flex "
-                    alt="pfp"
-                  />
-                </div>
-                <div className="w-[100%]">
-                  <div className="font-medium text-[20px] flex ml-[5px]">
-                    {data.username}
-                    <span className="text-otherColor/50 font-normal text-[10px]  ml-[10px] mt-[10px]">
-                      {data.date}
-                    </span>
-                  </div>
-                  <div className="text-otherColor mt-[5px]">{data.message}</div>
-                </div>
-              </div>
             </div>
           );
         })}
