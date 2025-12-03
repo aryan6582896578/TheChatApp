@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import axios from "axios";
 import {ServerListComponent} from "../userComponents/ServerListComponent.jsx"
 import ChannelListComponent from "./ChannelListComponent.jsx";
@@ -14,13 +14,16 @@ export default function MainChatPage() {
   const [displayMemberListComponent,setdisplayMemberListComponent ]=useState(true);
   const navigate = useNavigate();
   const parms = useParams();
-
+  const userId = useRef(null)
   async function getChannelData() {
     try {
 
       const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/channelList`,{
           withCredentials: true,
         });
+      if(!userId.current){
+        userId.current=channelListData.data.userId;
+      }
       if(channelListData.data.status === "userInValid"){
         
         navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`)
@@ -51,21 +54,22 @@ export default function MainChatPage() {
 
   if(channelCheck){ 
   return (
-    <div className="bg-orange-600 flex h-full">
+    <div className="bg-orange-600 flex h-full overflow-hidden max-w-svw">
       <ServerListComponent/>
 
-      <div className="bg-purple-800 flex flex-col">
+      <div className="bg-purple-800 flex flex-col min-w-fit">
         <ServerSettingComponent/>
         <ChannelListComponent/>
         <UserProfileComponent/>
       </div>
 
-      <div className="bg-pink-600 h-full flex flex-col w-full">
+      <div className="bg-pink-600 flex flex-col w-full">
         <ChannelHeadComponent setdisplayMemberListComponent={setdisplayMemberListComponent} displayMemberListComponent={displayMemberListComponent}/>
-        <div className="bg-yellow-800 flex h-full">
-          <ChatBoxComponent/>
+        <div className="bg-yellow-800 flex w-full overflow-hidden h-full">
+          <ChatBoxComponent userId={userId}/>
           <MemberListComponent displayMemberListComponent={displayMemberListComponent}/>
         </div>
+        
       </div>
     </div>
   )

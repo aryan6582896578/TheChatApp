@@ -20,7 +20,7 @@ export function MemberListComponent({displayMemberListComponent}){
   }, [parms.serverId,parms.channelId])
   
     return(
-      <div className={`h-[100%] w-fit bg-primaryColor flex flex-col ${displayMemberListComponent?"block":"hidden"}`}>
+      <div className={`h-[100%] min-w-fit bg-primaryColor flex flex-col ${displayMemberListComponent?"block":"hidden"}`}>
         <div className="text-[20px] text-otherColor font-medium text-center pb-[10px] mt-[10px] w-[200px]">
           MEMBERS
         </div>

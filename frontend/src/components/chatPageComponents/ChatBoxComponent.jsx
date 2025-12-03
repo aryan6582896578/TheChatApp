@@ -4,7 +4,7 @@ import { getJwtCookie, socket } from "../managesocket";
 import axios from "axios";
 
 
-export function ChatBoxComponent() {
+export function ChatBoxComponent({userId}) {
   const parms = useParams();
   const date = new Date();
   const [messageData, setmessageData] = useState("");
@@ -12,6 +12,26 @@ export function ChatBoxComponent() {
   const [displayMessageDb,setdisplayMessageDb]= useState([]);
   const [lastId,setlastId]=useState(null)
   const[userProfileInfo,setuserProfileInfo] = useState({username:"someshitisseriouslywrong",userprofileurl:null})
+  const bottomDiv = useRef(null)
+
+  function scrollBottom(){
+    bottomDiv.current?.scrollIntoView({ behavior: "auto" });
+  }
+
+  useEffect(() => {
+    if (!displayMessageSocket.length) return;
+    const lastMessage = displayMessageSocket[displayMessageSocket.length - 1];
+    if ( lastMessage.userId === userId.current) {
+      scrollBottom()
+    }
+
+  }, [displayMessageSocket]);
+
+  useEffect(() => {
+    if (!displayMessageDb.length) return;
+    scrollBottom()
+  }, [displayMessageDb]);
+
   async function getMessage() {
       const messageData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/getmessage/${parms.serverId}/${parms.channelId}?lastId=${lastId}`,{
         withCredentials: true,
@@ -63,66 +83,55 @@ export function ChatBoxComponent() {
       setdisplayMessageSocket([])
       setdisplayMessageDb([])
     }
-  }, [parms.serverId,parms.channelId])
+  }, [parms.serverId,parms.channelId,onload])
 
 
   return (
-    <div className="bg-primaryColor w-full h-full flex flex-col relative">
-      <div className=" flex flex-col absolute w-[100%] overflow-y-scroll bottom-[55px] top-[0]">
-        {displayMessageDb?.map((data, x) => {
-          return (
-            <div
-              key={x}
-              className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer"
-            >
-              <div className="font-medium text-textColor text-[20px]">
-                {displayMessageDb[x].username}
-                <span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">
-                  {displayMessageDb[x].displayDate}
-                </span>
+    <div className="bg-green-600 w-full relative flex flex-col overflow-hidden h-full">
+      <div className="h-full flex flex-col overflow-hidden bg-primaryColor overflow-x-hidden overflow-y-auto">
+        <div className=" flex flex-col bg-primaryColor p-[5px] pb-0 ">
+          {displayMessageDb.map((x)=>{
+            return(
+              <div className="bg-primaryColor min-h-[60px] flex hover:bg-secondaryColor cursor-pointer rounded-[5px]" key={x["_id"]} >
+                <div className="h-[50px] w-[50px] mt-[5px] mr-[5px] p-[5px]">
+                  <img src={x.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={x.username}/>
+                </div>
+                <div className="w-full">
+                  <div className="text-otherColor">{x.username} <span className="text-otherColor/40 text-[10px]">{x.displayDate}</span></div>
+                  <div className="text-otherColor break-all wrap-break-word mr-[5px]">{x.message}</div>
+                </div>
               </div>
-              <div className="text-otherColor text-opacity-[80%] break-before-column">
-                {displayMessageDb[x].message}
+            )
+          })}
+        </div>
+        <div className=" flex flex-col bg-primaryColor p-[5px]">
+          {displayMessageSocket.map((x)=>{
+            return(
+              <div className="bg-primaryColor min-h-[60px] flex hover:bg-secondaryColor cursor-pointer rounded-[5px]" key={x.messageId} >
+                <div className="h-[50px] w-[50px] mt-[5px] mr-[5px] p-[5px]">
+                  <img src={x.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={x.username}/>
+                </div>
+                <div className="w-full">
+                  <div className="text-otherColor">{x.username} <span className="text-otherColor/40 text-[10px]">{x.displayDate}</span></div>
+                  <div className="text-otherColor break-all wrap-break-word mr-[5px]">{x.message}</div>
+                </div>
               </div>
-            </div>
-          );
-        })}
-        {displayMessageSocket?.map((data, x) => {
-          return (
-            <div
-              key={x}
-              className="m-[5px] hover:bg-otherColor/5 p-[5px] rounded-[5px] cursor-pointer "
-            >
-              <div className="font-medium text-[20px] flex">
-                <img
-                  src={data.userprofileurl}
-                  className="w-[40px] h-[40px] rounded-[100%] mr-[10px] "
-                  alt="pfp"
-                />
-                {data.username}
-                <span className="text-otherColor font-normal text-[10px] opacity-[50%] ml-[10px]">
-                  {data.date}
-                </span>
-              </div>
-              <div className="text-otherColor text-opacity-[80%]">
-                {data.message}
-              </div>
-
-            </div>
-          );
-        })}
+            )
+          })}
+        </div>
+        <div ref={bottomDiv}></div>
       </div>
-
-      <div className="min-h-[55px] max-h-[55px] overflow-hidden bg-primaryColor flex w-[100%] absolute bottom-0">
-        <div
-          contentEditable className="w-[100%] h-[70%] ml-[10px] mt-auto mb-auto rounded-[5px] bg-otherColor/9 outline-none p-[5px] text-otherColor" onKeyDown={sendMessage}spellCheck={true} onInput={(e) => {
+      <div className="min-h-[55px] max-h-[100px] flex w-full overflow-hidden bg-primaryColor  overflow-x-hidden overflow-y-auto">
+        <div contentEditable className="bg-secondaryColor w-full p-[5px] m-[10px] ml-[5px] mr-[5px] text-otherColor outline-none h-fit whitespace-pre-wrap wrap-break-word overflow-x-hidden max-w-full" onKeyDown={sendMessage} spellCheck={true} onInput={(e) => {
             setmessageData(e.target.innerText);
           }}
         />
+        <div className="bg-[#5662f6] min-w-[5px] h-[40px] flex mt-auto mb-auto cursor-pointer" onClick={()=>{
+          scrollBottom()
+        }}></div>
       </div>
     </div>
   );
-
 
 
 

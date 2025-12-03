@@ -45,7 +45,7 @@ export default function LoginPage() {
     }
   }
 
-  document.title =`Login | ${import.meta.env.VITE_NAME}`
+  document.title =`Login | TheChatApp`
   return (
     <>
       {loadingPage ? (
@@ -56,7 +56,7 @@ export default function LoginPage() {
           <div className="bg-secondaryColor h-[70px] w-[100%] relative flex border-b-otherColor/80 border-b-[1px]">
               <div className="flex hover:cursor-pointer"onClick={()=>{navigate("/")}}>
                   <div className={`min-h-[70%] mb-auto mt-auto min-w-[5px] bg-textColor ml-[5px] rounded-[10%]`}></div>
-                  <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor text-white">{`${import.meta.env.VITE_NAME}`}</div>
+                  <div className="text-[25px] font-medium mt-auto mb-auto ml-[10px] hover:text-textColor text-white">TheChatApp</div>
               </div>
           </div>
           

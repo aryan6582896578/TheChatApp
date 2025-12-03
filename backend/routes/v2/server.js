@@ -41,7 +41,7 @@ export default function serverV2(app,socket,upload){
             })
           );
           const channelNameList = Object.fromEntries(names);
-          return res.json({ channelList: channelNameList ,status: "validUser" });
+          return res.json({ channelList: channelNameList ,status: "validUser",userId:userId });
         } else {
           res.json({ status: "userInValid" });
         }

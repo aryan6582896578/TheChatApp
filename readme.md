@@ -12,6 +12,7 @@
 - private message
 - voip in server / dms
 - fix jwt logic 2+ valid jwt will be active for password change or username or userprofile use redis to cache timestamp and prevent db hit on every api  
+- add auto retry later
 
 
 > ### frontend TODO

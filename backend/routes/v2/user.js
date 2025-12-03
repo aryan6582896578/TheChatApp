@@ -29,7 +29,7 @@ export default function user(app,socket,upload){
   router.get("/", checkJwt, async (req, res) => {
   if (req.validUser) {
         let userData = await getUserData(req.username);
-        res.json({ status: "userValid",username: req.username,userId: req.userId , userprofileurl:userData.userprofileurl});
+        res.json({ status: "userValid",username: req.username,userId: req.userId , userprofileurl:userData?.userprofileurl});
       } else {
         res.clearCookie("tokenJwt");
         res.json({ status: "userInvalid" });
