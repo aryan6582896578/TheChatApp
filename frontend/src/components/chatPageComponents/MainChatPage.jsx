@@ -54,18 +54,18 @@ export default function MainChatPage() {
 
   if(channelCheck){ 
   return (
-    <div className="bg-orange-600 flex h-full overflow-hidden max-w-svw">
+    <div className="bg-primaryColor flex h-full overflow-hidden max-w-svw">
       <ServerListComponent/>
 
-      <div className="bg-purple-800 flex flex-col min-w-fit">
+      <div className="flex flex-col min-w-fit">
         <ServerSettingComponent/>
         <ChannelListComponent/>
         <UserProfileComponent/>
       </div>
 
-      <div className="bg-pink-600 flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <ChannelHeadComponent setdisplayMemberListComponent={setdisplayMemberListComponent} displayMemberListComponent={displayMemberListComponent}/>
-        <div className="bg-yellow-800 flex w-full overflow-hidden h-full">
+        <div className="flex w-full overflow-hidden h-full">
           <ChatBoxComponent userId={userId}/>
           <MemberListComponent displayMemberListComponent={displayMemberListComponent}/>
         </div>

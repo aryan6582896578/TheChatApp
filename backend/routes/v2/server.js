@@ -232,13 +232,16 @@ export default function serverV2(app,socket,upload){
           channelId:channelId,
           _id:{$lt :lastId}
         }).limit(20).sort({_id:-1});
-        res.json({messages:getMessages })
+        const sendMessage = getMessages.reverse()
+        // console.log(sendMessage)
+        const lastMessageId = Object.values(getMessages)[0]?.["_id"]
+        res.json({messages:sendMessage, lastMessageId:lastMessageId })
       }else{
         const getMessages = await messageDataModel.find({
           channelId:channelId,
         }).sort({createdAt:-1}).limit(20)
         const sendMessage = getMessages.reverse()
-        const lastMessageId = Object.values(getMessages)[0]?.message
+        const lastMessageId = Object.values(getMessages)[0]?.["_id"]
         res.json({messages:sendMessage , lastMessageId:lastMessageId})
       }
     }else{

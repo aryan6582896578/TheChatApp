@@ -59,9 +59,8 @@ console.log(socket.handshake.auth)
             console.log(socket.serverId,socket.channelId,"FF")
             const count = io.engine.clientsCount;
             console.log("Online total ", count);
-            const roomSize = io.sockets.adapter.rooms.get(`${socket.serverId}/${socket.channelId}`)?.size || 0;
-            console.log(`${socket.serverId}/${socket.channelId}`,"online: ",roomSize)
-            io.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`, messageData); 
+            const onlineUserCount = io.sockets.adapter.rooms.get(`${socket.serverId}/${socket.channelId}`)?.size || 0;
+            io.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`, messageData,onlineUserCount); 
           } catch (error) {
             console.log("error sending || saving message",error)
           }
