@@ -19,15 +19,12 @@ export default function AuthCheckMain() {
       //   console.log("yess",x);
       // })
     }else{
+      socket.disconnect();
       navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);
     }
   }
   useEffect(() => {
     verifyUser()
-    if(!socket.connected){
-      socket.connect();
-    }
-    console.log(socket.connected ,"socket check")
   }, []);
 
   if(userStatus){

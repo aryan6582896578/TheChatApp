@@ -13,7 +13,7 @@ import LoginPage from "./components/authComponents/LoginPage.jsx";
 import { socket } from "./components/managesocket.js";
 
 let container = null;
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded",async function (event) {
   if (!container) {
     container = document.getElementById("root");
     const root = createRoot(container);
@@ -23,15 +23,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
         return cookie[1]
       }
     }
-      function setSocketData(){
+    function setSocketData(){
       const jwtToken = getJwtCookie()
       socket.auth = {jwtToken}
-  }
-  setSocketData();
-  if (!socket.connected) {
-    socket.connect();
-  }
+    }
+    setSocketData();
+    if (!socket.connected) {
+      socket.connect();
+    }
     root.render(
+      
       <BrowserRouter>
         <Routes>
 

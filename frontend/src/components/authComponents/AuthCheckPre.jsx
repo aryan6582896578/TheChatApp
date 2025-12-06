@@ -19,6 +19,8 @@ export default function AuthCheckPre() {
       if (userData.data.status === "userValid") {
         setuserStatus(true);
         navigate(`/${import.meta.env.VITE_SERVERURL}/@me/chat`);
+      }else{
+        socket.disconnect();
       }
     } catch (error) {
       console.log("Server Error");
@@ -27,6 +29,7 @@ export default function AuthCheckPre() {
 
   useEffect(() => {
     verifyUser()
+    
   }, [])
   
 
