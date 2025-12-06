@@ -2,11 +2,11 @@
 
 > ### Backend TODO
 
-- fix message storage socket logic
+- ~~fix message storage socket logic~~
 - ~~redis~~
 -  ~~send server name in render list~~
-- check auth logic
-- password/username/pfp change
+- check auth logic 
+- password/username/pfp change cache update
 - server change
 - add friends system
 - private message

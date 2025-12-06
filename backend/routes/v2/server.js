@@ -139,7 +139,6 @@ export default function serverV2(app,socket,upload,redisClient){
                     const userprofileurl=getRedisData.userprofileurl
                     return [userId[0], { username, userprofileurl }];
                   }
-
                 })
               );
               const usernameListData = Object.fromEntries(usernames);
@@ -248,7 +247,27 @@ export default function serverV2(app,socket,upload,redisClient){
           channelId:channelId,
           _id:{$lt :lastId}
         }).limit(20).sort({_id:-1});
-        const sendMessage = getMessages.reverse()
+        let sendMessage = getMessages.reverse()
+        sendMessage = await Promise.all(
+          sendMessage.map(async (userMessage)=>{
+            // console.log(userMessage.userId)
+            let getRedisData = await redisClient.hGetAll(userMessage.userId);
+            if (Object.keys(getRedisData).length === 0) {
+              const getUserDataDb = await getUserDataId(userMessage.userId);
+              console.log(getUserDataDb)
+              const setRedisData = await redisClient.hSet(userMessage.userId, {
+                userprofileurl: getUserDataDb.userprofileurl,
+                lastUpdated: getUserDataDb.lastUpdated,
+                username: getUserDataDb.username,
+              });
+              const userprofileurl = getUserDataDb.userprofileurl;
+              return [userMessage, userprofileurl ];
+            } else {
+              const userprofileurl = getRedisData.userprofileurl;
+              return [userMessage, userprofileurl ];
+            }
+          })
+        ) 
         // console.log(sendMessage)
         const lastMessageId = Object.values(getMessages)[0]?.["_id"]
         res.json({messages:sendMessage, lastMessageId:lastMessageId })
@@ -256,7 +275,28 @@ export default function serverV2(app,socket,upload,redisClient){
         const getMessages = await messageDataModel.find({
           channelId:channelId,
         }).sort({createdAt:-1}).limit(20)
-        const sendMessage = getMessages.reverse()
+        let sendMessage = getMessages.reverse()
+
+        sendMessage = await Promise.all(
+          sendMessage.map(async (userMessage)=>{
+            // console.log(userMessage.userId)
+            let getRedisData = await redisClient.hGetAll(userMessage.userId);
+            if (Object.keys(getRedisData).length === 0) {
+              const getUserDataDb = await getUserDataId(userMessage.userId);
+              console.log(getUserDataDb)
+              const setRedisData = await redisClient.hSet(userMessage.userId, {
+                userprofileurl: getUserDataDb.userprofileurl,
+                lastUpdated: getUserDataDb.lastUpdated,
+                username: getUserDataDb.username,
+              });
+              const userprofileurl = getUserDataDb.userprofileurl;
+              return [userMessage, userprofileurl ];
+            } else {
+              const userprofileurl = getRedisData.userprofileurl;
+              return [userMessage, userprofileurl ];
+            }
+          })
+        ) 
         const lastMessageId = Object.values(getMessages)[0]?.["_id"]
         res.json({messages:sendMessage , lastMessageId:lastMessageId})
       }

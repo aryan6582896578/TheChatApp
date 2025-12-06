@@ -54,7 +54,6 @@ export default async function runsocket(io) {
               displayDate:data.date,
               message:data.message,
               username:socket.username,
-              userprofileurl:data.userprofileurl
             })
             console.log(socket.serverId,socket.channelId,"FF")
             const count = io.engine.clientsCount;
