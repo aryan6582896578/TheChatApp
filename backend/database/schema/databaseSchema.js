@@ -7,7 +7,8 @@ const userData = mongoose.Schema({
  createdDate: { type:String,required: true },
  userid:{type:String,required:true},
  servers:{type:Array},
- userprofileurl:{type:String}
+ userprofileurl:{type:String},
+ lastUpdated:{type:String,required: true}
 },{ timestamps: true });
 const userDataModel = mongoose.model("userdata", userData);
 
@@ -51,7 +52,6 @@ const messageData = mongoose.Schema({
     displayDate:{type:String,required: true},
     message:{type:String,required: true},
     username:{type:String,required: true},
-    userprofileurl:{type:String}
 },{ timestamps: true })
 const messageDataModel = mongoose.model("messageData", messageData);
 

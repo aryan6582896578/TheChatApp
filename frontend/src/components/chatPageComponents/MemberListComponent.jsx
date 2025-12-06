@@ -4,15 +4,19 @@ import axios from "axios";
 export function MemberListComponent({displayMemberListComponent}){
   const parms = useParams();
   const [membersId, setmembersId] = useState([]);
-  const [membersUsername, setmembersUsername] = useState([]);
+  const [membersData, setmembersData] = useState([]);
+  const[memberListData,setmemberListData]=useState([]);
 
   async function getMemberList() {
     if(parms.channelId){
       const channelMemberList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${ parms.serverId}/${parms.channelId}/channelMemberList`,{
         withCredentials: true,
       });
-      setmembersId(Object.keys(channelMemberList.data.usernameList))
-      setmembersUsername(Object.values(channelMemberList.data.usernameList))
+      setmemberListData(Object.entries(channelMemberList.data.usernameList))
+      // console.log(channelMemberList.data.usernameList)
+      // console.log(Object.keys(channelMemberList.data.usernameList))
+      // setmembersId(Object.keys(channelMemberList.data.usernameList))
+      // setmembersData(Object.values(channelMemberList.data.usernameList))
     }   
   }
   useEffect(() => {
@@ -25,12 +29,13 @@ export function MemberListComponent({displayMemberListComponent}){
           MEMBERS
         </div>
         <div className="m-[10px] mt-[0px] rounded-[5px] h-[100%] mb-[10px] flex flex-col " >
-          {membersId?.map((userId,x) => (
-                
-            <div key={membersId[x]} id={userId} > 
-              <div className="text-[20px] font-medium m-[10px] mb-[0px] text-otherColor text-opacity-[60%] hover:text-otherColor min-h-[35px] max-h-[35px] text-center overflow-hidden duration-[0.5s] cursor-pointer">
-                {membersUsername[x]}
-              </div>  
+          {memberListData?.map(([userId, userData]) => (
+            // console.log(id,user)
+            <div className="flex align-middle items-center hover:bg-secondaryColor cursor-pointer rounded-[5px] p-[5px] text-otherColor/90 hover:text-otherColor" key={userId}>
+              <div className="h-[50px] w-[50px]  mr-[5px] p-[5px]">
+                <img src={userData.userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={userData.username}/>
+              </div>
+              <div className="text-[20px] font-semibold  ">{userData.username}</div>
             </div>
           ))}
         </div>

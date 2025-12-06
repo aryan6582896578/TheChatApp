@@ -39,3 +39,4 @@ custom id https://discord.com/developers/docs/reference#snowflakes
 
 https://cloudinary.com/blog/guest_post/how-to-parse-media-files-with-multer
 https://mongoosejs.com/docs/8.x/docs/queries.html
+https://redis.io/docs/latest/develop/clients/nodejs/

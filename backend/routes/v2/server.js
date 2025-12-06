@@ -1,11 +1,11 @@
 import express from "express";
 import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../database/managedata/authData.js";
-import { getChannelName, getServerChannelMemberList, getServerData, getUserData, getUsername, validInviteCode, validServerChannelList } from "../../database/managedata.js";
+import { getChannelName, getServerChannelMemberList, getServerData, getUserData, getUserDataId, getUsername, validInviteCode, validServerChannelList } from "../../database/managedata.js";
 import { inviteDataModel, messageDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
 import { channelPermissionCheck } from "./other.js";
 const router = express.Router({ mergeParams: true })
-export default function serverV2(app,socket,upload){
+export default function serverV2(app,socket,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 server");
@@ -122,8 +122,24 @@ export default function serverV2(app,socket,upload){
 
               const usernames = await Promise.all(
                 usernameList.map(async (userId) => {
-                  const username = await getUsername(userId);
-                  return [userId, username];
+                  let getRedisData = await redisClient.hGetAll(userId[0]);
+                  if(Object.keys(getRedisData).length===0){
+                    const getUserDataDb = await getUserDataId(userId[0])
+                    // console.log(getUserDataDb)
+                    const setRedisData = await redisClient.hSet(userId[0],{
+                      userprofileurl:getUserDataDb.userprofileurl,
+                      lastUpdated:getUserDataDb.lastUpdated,
+                      username:getUserDataDb.username
+                    })
+                    const username =getUserDataDb.username
+                    const userprofileurl=getUserDataDb.userprofileurl
+                    return [userId[0], { username, userprofileurl }];
+                  }else{
+                    const username =getRedisData.username
+                    const userprofileurl=getRedisData.userprofileurl
+                    return [userId[0], { username, userprofileurl }];
+                  }
+
                 })
               );
               const usernameListData = Object.fromEntries(usernames);

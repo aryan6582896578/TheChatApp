@@ -1,11 +1,11 @@
 import express from "express";
 import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../database/managedata/authData.js";
-import { getUserData, userDataSeverList } from "../../database/managedata.js";
+import { getUserData, getUserDataId, userDataSeverList } from "../../database/managedata.js";
 import { inviteDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
 const router = express.Router({ mergeParams: true })
 
-export default function user(app,socket,upload){
+export default function user(app,socket,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 user ");
@@ -17,6 +17,20 @@ export default function user(app,socket,upload){
           req.username = usernameValidToken,
           req.userId = userIdValidToken;
           // socket.to("testserver").emit("testserver", "hmmmmmm  testserver auth");
+          let redisData = await redisClient.hGetAll(userIdValidToken);
+          if(Object.keys(redisData).length===0){
+            console.log(`data not cached for ${usernameValidToken}`);
+            const userData= await getUserDataId(userIdValidToken)
+            console.log(userData)
+            const setRedisData = await redisClient.hSet(userIdValidToken,{
+              userprofileurl:userData.userprofileurl,
+              lastUpdated:userData.lastUpdated,
+              username:usernameValidToken
+            })
+          }else{
+            req.userprofileurl=redisData.userprofileurl;
+            // console.log(redisData.username);
+          }
         } else {
           req.validUser = false;
         }
@@ -28,8 +42,8 @@ export default function user(app,socket,upload){
 
   router.get("/", checkJwt, async (req, res) => {
   if (req.validUser) {
-        let userData = await getUserData(req.username);
-        res.json({ status: "userValid",username: req.username,userId: req.userId , userprofileurl:userData?.userprofileurl});
+        // let userData = await getUserData(req.username);
+        res.json({ status: "userValid",username: req.username,userId: req.userId , userprofileurl:req.userprofileurl});
       } else {
         res.clearCookie("tokenJwt");
         res.json({ status: "userInvalid" });

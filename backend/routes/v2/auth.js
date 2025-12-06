@@ -5,7 +5,7 @@ import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../d
 import { createCustomId } from "../../database/managedata/customData.js";
 const router = express.Router({ mergeParams: true })
 
-export default function auth(app,socket,upload){
+export default function auth(app,socket,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 auth");
@@ -16,7 +16,6 @@ export default function auth(app,socket,upload){
           req.validUser = true,
           req.username = usernameValidToken,
           req.userId = userIdValidToken;
-
         } else {
           req.validUser = false;
         }
@@ -53,6 +52,7 @@ export default function auth(app,socket,upload){
                 createdDate: `${currentDate}`,
                 userid: `${userID}`,
                 userprofileurl: "https://res.cloudinary.com/dz9lsudey/image/upload/v1759405162/default_pfp_aflbjz.png",
+                lastUpdated:`${currentDate}`
             });
 
             await userDataModel.findOneAndUpdate(

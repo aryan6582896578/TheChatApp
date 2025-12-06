@@ -3,7 +3,7 @@
 > ### Backend TODO
 
 - fix message storage socket logic
-- redis
+- ~~redis~~
 -  ~~send server name in render list~~
 - check auth logic
 - password/username/pfp change

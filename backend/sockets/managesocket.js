@@ -10,7 +10,7 @@ export default async function runsocket(io) {
   //       console.log(y,"Ff")
   //       io.to("testserver").emit("testserver", "hmmmmmm  testserver");
   //  })
-console.log(socket.handshake.auth)
+// console.log(socket.handshake.auth)
     if(socket.handshake.auth.jwtToken){
 
       socket.on("joinServer", async ({  jwtToken,serverId,channelId }) => {

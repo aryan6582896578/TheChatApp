@@ -1,11 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ quiet: true });
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import { dbApp } from "./database/database.js";
+import { createClient } from 'redis';
 
 import runsocket from "./sockets/managesocket.js";
 import runroutes from "./routes/manageroutes.js";
@@ -13,6 +14,22 @@ import createDefaultData from "./database/default/createdefault.js";
 const app = express();
 const httpServer = createServer(app);
 
+
+const redisClient = createClient({
+    username: 'default',
+    password: `${process.env.redisCloudPassword}`,
+    socket: {
+        host: 'redis-16885.crce179.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 16885
+    }
+});
+redisClient.on('error', err => console.log('Redis Client Error', err));
+await redisClient.connect();
+if(redisClient.isReady){
+  console.log("connected to redis")
+  
+}
+// redisClient.flushAll();
 
 
 import multer from "multer";
@@ -48,7 +65,7 @@ const socket = new Server(httpServer, {
 //manageroutesimages(app,upload)
 runsocket(socket)
 runroutes(app,socket,upload)
-routesv2(app,socket,upload)
+routesv2(app,socket,upload,redisClient)
 
 async function runServer() {
   try {

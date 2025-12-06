@@ -139,7 +139,19 @@ async function getUserData(username) {
     }
     
 }
+async function getUserDataId(userId) {
+    const userData = await userDataModel.findOne({userid:userId})
+    if(userData){
+        const userinfo = {
+            username:userData.username,
+            lastUpdated:userData.lastUpdated,
+            userprofileurl:userData.userprofileurl || " ",
+        }
+        return userinfo
 
+    }
+    
+}
 async function getServerPermission(serverId) {
     const serverPermission= await serverDataModel.findOne({serverId:serverId})
     return serverPermission
@@ -148,4 +160,4 @@ async function getServerPermission(serverId) {
     
 // }
 
-export {getServerPermission,getUserData,getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}
+export {getUserDataId,getServerPermission,getUserData,getUserId,createInviteCode,validInviteCode,getServerChannelList,userDataSeverList,getServerData,getServerChannelMemberList,validServerChannelList,getChannelName,getUsername,getServerChannelData}
