@@ -29,8 +29,12 @@ if(redisClient.isReady){
   console.log("connected to redis")
   
 }
-// redisClient.flushAll();
 
+function flushCache(){
+  redisClient.flushAll();
+  console.log("cache flushed")
+}
+// flushCache()
 
 import multer from "multer";
 import { routesv2 } from "./routes/routesv2.js";

@@ -9,8 +9,8 @@ export default function user(app,socket,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 user ");
-        // console.log("jwt check in user v2")
-        if (validToken) {
+        console.log("jwt check in user v2")
+        if (validToken.username && validToken.userId && validToken.lastUpdated) {
           const usernameValidToken = validToken.username;
           const userIdValidToken = validToken.userId;
           req.validUser = true,
@@ -21,17 +21,33 @@ export default function user(app,socket,upload,redisClient){
           if(Object.keys(redisData).length===0){
             console.log(`data not cached for ${usernameValidToken}`);
             const userData= await getUserDataId(userIdValidToken)
-            console.log(userData)
-            const setRedisData = await redisClient.hSet(userIdValidToken,{
-              userprofileurl:userData.userprofileurl,
-              lastUpdated:userData.lastUpdated,
-              username:usernameValidToken
-            })
+            // console.log(userData)
+            if(validToken.lastUpdated<userData.lastUpdated){
+              console.log("old jwt token")
+              res.clearCookie("tokenJwt");
+              req.validUser = false;
+            }else{
+              const setRedisData = await redisClient.hSet(userIdValidToken,{
+                userprofileurl:userData.userprofileurl,
+                lastUpdated:userData.lastUpdated,
+                username:usernameValidToken
+              })
+            }
           }else{
-            req.userprofileurl=redisData.userprofileurl;
-            // console.log(redisData.username);
+            // console.log("tokenn",(validToken.lastUpdated),"redis",(parseInt(redisData.lastUpdated)))
+            if((validToken.lastUpdated)!=(parseInt(redisData.lastUpdated))){
+              console.log("old jwt token")
+              res.clearCookie("tokenJwt");
+              req.validUser = false;
+            }else{
+              req.userprofileurl=redisData.userprofileurl;
+            }
+            
+            // console.log(redisData);
+
           }
         } else {
+          res.clearCookie("tokenJwt");
           req.validUser = false;
         }
       } catch (error) {

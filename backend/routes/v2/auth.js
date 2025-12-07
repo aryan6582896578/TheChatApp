@@ -44,6 +44,7 @@ export default function auth(app,socket,upload,redisClient){
             const userID = createCustomId().toString();
             const defaultServer = "7326033090969600000";
             const hashedhPassword = await createPasswordHash(passwordData);
+            const timestamp = Date.now();
             try {
             await userDataModel.create({
                 _id: `${usernameData}`,
@@ -52,7 +53,7 @@ export default function auth(app,socket,upload,redisClient){
                 createdDate: `${currentDate}`,
                 userid: `${userID}`,
                 userprofileurl: "https://res.cloudinary.com/dz9lsudey/image/upload/v1759405162/default_pfp_aflbjz.png",
-                lastUpdated:`${currentDate}`
+                lastUpdated:`${timestamp}`
             });
 
             await userDataModel.findOneAndUpdate(
@@ -69,8 +70,7 @@ export default function auth(app,socket,upload,redisClient){
                 { serverId: `${defaultServer}` },
                 { $push: { members: `${userID}` } }
             );
-
-            const createToken = signJwt(usernameData, userID);
+            const createToken = signJwt(usernameData, userID,timestamp);
             const userCreated = await userDataModel.findOne({
                 userid: `${userID}`,
             });
@@ -102,7 +102,14 @@ export default function auth(app,socket,upload,redisClient){
                     const checkHash = await checkPasswordHash(passwordData,getUserdata.password);
                     try {
                         if (getUserdata && checkHash === true) {
-                            const createToken = signJwt(usernameData, userID);
+                            console.log(getUserdata.userid,"ff",getUserdata)
+                            const timestamp = getUserdata.lastUpdated;
+                            const setRedisData = await redisClient.hSet(getUserdata.userid,{
+                                userprofileurl:getUserdata.userprofileurl,
+                                lastUpdated:getUserdata.lastUpdated,
+                                username:usernameData
+                            })
+                            const createToken = signJwt(usernameData, userID,timestamp);
                             res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000});
                             res.json({ status: "userValid" });
                         } else {

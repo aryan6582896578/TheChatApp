@@ -4,8 +4,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const saltCount = process.env.saltCount;
 
-export function signJwt(username, userId) {
-  const createJwtToken = jwt.sign({ username: username, userId: userId, test: true },process.env.privateKey);
+export function signJwt(username, userId,timestamp) {
+  const createJwtToken = jwt.sign({ username: username, userId: userId,lastUpdated:timestamp || 0 },process.env.privateKey);
   return createJwtToken;
 }
 
