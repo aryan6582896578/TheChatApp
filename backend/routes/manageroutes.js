@@ -19,46 +19,46 @@ export default function runroutes(app, socket,upload) {
         req.validUser = false;
       }
     } catch (error) {
-      console.log("no cookie jwtcheck");
+      console.log("no cookie jwtcheck v1");
     }
     next();
   }
 
-app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
-    async function runMiddleware(req, res, fn) {
-      return new Promise((resolve, reject) => {
-        fn(req, res, (result) => {
-          if (result instanceof Error) {
-            return reject(result);
-          }
-          return resolve(result);
-        });
-      });
-    }
-    if (req.validUser) {
-      const myUploadMiddleware = upload.single("img");       
-        try {
-          await runMiddleware(req, res, myUploadMiddleware);
-          const b64 = Buffer.from(req.file.buffer).toString("base64");
-          let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-          const cldRes = await uploadImage(dataURI);
-          console.log(cldRes)
-          await userDataModel.findOneAndUpdate({
-            userid:`${req.userId}`
-          },{
-            userprofileurl:`${cldRes.url}`
-          })
-          socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
-          console.log("pfp updated")
-          res.json({status:"updated"});
-  } catch (error) {
-    console.log(error);
-    res.send({
-      message: error.message,
-    });
-  }
+// app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
+//     async function runMiddleware(req, res, fn) {
+//       return new Promise((resolve, reject) => {
+//         fn(req, res, (result) => {
+//           if (result instanceof Error) {
+//             return reject(result);
+//           }
+//           return resolve(result);
+//         });
+//       });
+//     }
+//     if (req.validUser) {
+//       const myUploadMiddleware = upload.single("img");       
+//         try {
+//           await runMiddleware(req, res, myUploadMiddleware);
+//           const b64 = Buffer.from(req.file.buffer).toString("base64");
+//           let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+//           const cldRes = await uploadImage(dataURI);
+//           console.log(cldRes)
+//           await userDataModel.findOneAndUpdate({
+//             userid:`${req.userId}`
+//           },{
+//             userprofileurl:`${cldRes.url}`
+//           })
+//           socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
+//           console.log("pfp updated")
+//           res.json({status:"updated"});
+//   } catch (error) {
+//     console.log(error);
+//     res.send({
+//       message: error.message,
+//     });
+//   }
 
-    }})
+// }})
   // app.get("/v1/verify", checkJwt, async (req, res) => {
   //   if (req.validUser) {
   //     let userData = await getUserData(req.username);
@@ -425,61 +425,61 @@ app.post("/v1/me/updateProfilePicture", checkJwt, async (req, res) => {
   //   }
   // });
 
-  app.get("/v1/messageData/:serverId/:channelId/:messageLength",checkJwt,async (req, res) => {
-      const userId = req.userId;
-      const serverId = req.params.serverId;
-      const channelId = req.params.channelId;
-      const messageLength = req.params.messageLength
-      if (req.validUser && req.userId && serverId) {
-        const serverData = await getServerData(serverId);
-        if (serverData) {
-          const serverMemberList = serverData.members;
-          if (serverMemberList.includes(userId)) {
-            const channelData = await getServerChannelData(channelId)
-            if(channelData){
-              const channelMemberList = channelData.members
-              if(channelMemberList.includes(userId)){
-              // const messageData = await messageDataModel.find({
-              //   channelId:channelId
-              // }).limit(20)
-              const messageData = await messageDataModel.aggregate([
-                {
-                  $match:{
-                    channelId:channelId
-                  }, 
-                },{
-                  $sort:{
-                    createdAt:-1
-                  }
-                },{
-                  $limit:Number(messageLength)
-                },{
-                  $sort:{
-                    createdAt:1
-                  }
-                },
-              ])
-              const messageCount = await messageDataModel.aggregate([
-                {
-                  $count:channelId || 0
-                }
-              ])
-              res.json({message:messageData,messageCountMax:messageCount[0]?.[channelId]})
-            }else {
-            res.json({ status: "userInValid" });
-          }
-            }
+  // app.get("/v1/messageData/:serverId/:channelId/:messageLength",checkJwt,async (req, res) => {
+  //     const userId = req.userId;
+  //     const serverId = req.params.serverId;
+  //     const channelId = req.params.channelId;
+  //     const messageLength = req.params.messageLength
+  //     if (req.validUser && req.userId && serverId) {
+  //       const serverData = await getServerData(serverId);
+  //       if (serverData) {
+  //         const serverMemberList = serverData.members;
+  //         if (serverMemberList.includes(userId)) {
+  //           const channelData = await getServerChannelData(channelId)
+  //           if(channelData){
+  //             const channelMemberList = channelData.members
+  //             if(channelMemberList.includes(userId)){
+  //             // const messageData = await messageDataModel.find({
+  //             //   channelId:channelId
+  //             // }).limit(20)
+  //             const messageData = await messageDataModel.aggregate([
+  //               {
+  //                 $match:{
+  //                   channelId:channelId
+  //                 }, 
+  //               },{
+  //                 $sort:{
+  //                   createdAt:-1
+  //                 }
+  //               },{
+  //                 $limit:Number(messageLength)
+  //               },{
+  //                 $sort:{
+  //                   createdAt:1
+  //                 }
+  //               },
+  //             ])
+  //             const messageCount = await messageDataModel.aggregate([
+  //               {
+  //                 $count:channelId || 0
+  //               }
+  //             ])
+  //             res.json({message:messageData,messageCountMax:messageCount[0]?.[channelId]})
+  //           }else {
+  //           res.json({ status: "userInValid" });
+  //         }
+  //           }
             
             
-          } else {
-            res.json({ status: "userInValid" });
-          }
-        } else {
-          res.json({ status: "userInValid" });
-        }
-      }
-    }
-  );
+  //         } else {
+  //           res.json({ status: "userInValid" });
+  //         }
+  //       } else {
+  //         res.json({ status: "userInValid" });
+  //       }
+  //     }
+  //   }
+  // );
 
   app.post("/v1/updateServerName/:serverId", checkJwt, async (req, res) => {
     const userId = req.userId;

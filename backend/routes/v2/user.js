@@ -3,6 +3,7 @@ import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../d
 import { getUserData, getUserDataId, userDataSeverList } from "../../database/managedata.js";
 import { inviteDataModel, serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
+import uploadImage from "../../database/managedata/imageData.js";
 const router = express.Router({ mergeParams: true })
 
 export default function user(app,socket,upload,redisClient){
@@ -130,56 +131,98 @@ export default function user(app,socket,upload,redisClient){
     }
   });
   
-router.post("/joinServer", checkJwt, async (req, res) => {
-    if (req.validUser) {
-      const serverInviteCodeJoin = req.body.serverInviteCode;
-      try {
-        const serverInviteCode = await inviteDataModel.findOne({
-          inviteCode: `${serverInviteCodeJoin}`,
-        });
-        if (serverInviteCode) {
-          const getUserid = req.userId;
-
-          const userInServerCheck = await userDataModel.findOne({
-            userid: `${getUserid}`,
+  router.post("/joinServer", checkJwt, async (req, res) => {
+      if (req.validUser) {
+        const serverInviteCodeJoin = req.body.serverInviteCode;
+        try {
+          const serverInviteCode = await inviteDataModel.findOne({
+            inviteCode: `${serverInviteCodeJoin}`,
           });
+          if (serverInviteCode) {
+            const getUserid = req.userId;
 
-          if (userInServerCheck.servers.includes(serverInviteCode.serverId)) {
-            res.json({
-              status: "alreadyJoined",
-              serverId: `${serverInviteCode.serverId}`,
+            const userInServerCheck = await userDataModel.findOne({
+              userid: `${getUserid}`,
             });
-          } else {
-            const channelList = await serverDataModel.findOne({
-              serverId: serverInviteCode.serverId,
-            });
-            await userDataModel.findOneAndUpdate(
-              { userid: `${getUserid}` },
-              { $push: { servers: `${serverInviteCode.serverId}` } }
-            );
-            await serverDataModel.findOneAndUpdate(
-              { serverId: `${serverInviteCode.serverId}` },
-              { $push: { members: `${getUserid}` } }
-            );
-            const channelListId = channelList.channels;
-            channelListId.map(async (x) => {
-              await serverChannelsDataModel.findOneAndUpdate(
-                { channelId: `${x}` },
+
+            if (userInServerCheck.servers.includes(serverInviteCode.serverId)) {
+              res.json({
+                status: "alreadyJoined",
+                serverId: `${serverInviteCode.serverId}`,
+              });
+            } else {
+              const channelList = await serverDataModel.findOne({
+                serverId: serverInviteCode.serverId,
+              });
+              await userDataModel.findOneAndUpdate(
+                { userid: `${getUserid}` },
+                { $push: { servers: `${serverInviteCode.serverId}` } }
+              );
+              await serverDataModel.findOneAndUpdate(
+                { serverId: `${serverInviteCode.serverId}` },
                 { $push: { members: `${getUserid}` } }
               );
-            });
-            res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
+              const channelListId = channelList.channels;
+              channelListId.map(async (x) => {
+                await serverChannelsDataModel.findOneAndUpdate(
+                  { channelId: `${x}` },
+                  { $push: { members: `${getUserid}` } }
+                );
+              });
+              res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
+            }
+          } else {
+            res.json({ status: "invalidCode" });
           }
-        } else {
-          res.json({ status: "invalidCode" });
+        } catch (error) {
+          console.log(error, "error in joining server ");
         }
-      } catch (error) {
-        console.log(error, "error in joining server ");
       }
+    });
+  router.post("/updateProfilePicture", checkJwt, async (req, res) => {
+      async function runMiddleware(req, res, fn) {
+        return new Promise((resolve, reject) => {
+          fn(req, res, (result) => {
+            if (result instanceof Error) {
+              return reject(result);
+            }
+            return resolve(result);
+          });
+        });
+      }
+      if (req.validUser) {
+        const myUploadMiddleware = upload.single("img");       
+          try {
+            await runMiddleware(req, res, myUploadMiddleware);
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const cldRes = await uploadImage(dataURI);
+            console.log(cldRes)
+            await userDataModel.findOneAndUpdate({
+              userid:`${req.userId}`
+            },{
+              userprofileurl:`${cldRes.url}`
+            })
+            let redisData = await redisClient.hGetAll(req.userId);
+            const setRedisData = await redisClient.hSet(req.userId,{
+              userprofileurl:cldRes.url,
+              lastUpdated:redisData.lastUpdated,
+              username:redisData.username
+            })
+            // socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
+            console.log("pfp updated",setRedisData)
+            res.json({status:"updated"});
+    } catch (error) {
+      console.log(error);
+      res.send({
+        message: error.message,
+      });
     }
-  });
-  return router
-}
+
+  }})    
+    return router
+  }
+
 
 
 

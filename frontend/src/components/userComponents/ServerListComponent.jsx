@@ -10,7 +10,7 @@ export function ServerListComponent() {
   const [disableServerCreateButton,setdisableServerCreateButton] =useState("")
 
   const [serverCreateBoxDisplay,setserverCreateBoxDisplay] = useState(false);
-  const [createServerData, setcreateServerData] = useState({ serverName: "" });
+  const [createServerData, setcreateServerData] = useState({ serverName: null });
   const [createServerError,setcreateServerError]=useState("");
 
   const [serverJoinBoxDisplay,setserverJoinBoxDisplay]=useState(false);
@@ -41,7 +41,8 @@ export function ServerListComponent() {
         })
         if(createServer.data.status==="CreatedServer"){
           setserverCreateBoxDisplay(false);
-          setcreateServerData("")
+          setcreateServerData({...createServerData,serverName: null})
+          
           await navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${createServer.data.serverId}`);
         }        
       } catch (error) {
@@ -76,7 +77,7 @@ export function ServerListComponent() {
     getUserData();
 
     return ()=>{
-      setcreateServerData({ serverName: "" })
+      setcreateServerData({...createServerData,serverName: null})
       setserverBoxDisplay(false);
       setserverCreateBoxDisplay(false);
       setserverJoinBoxDisplay(false);
@@ -84,17 +85,17 @@ export function ServerListComponent() {
   },[parms.serverId,parms.channelId]);
 
   return (
-    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor relative border-solid border-r-[1px] border-secondaryColor z-[10]">
+    <div className=" h-[100vh] min-w-[60px] max-w-[70px] bg-primaryColor  text-textColor relative border-solid border-r-[1px] border-secondaryColor z-[10] flex flex-col">
 
       <div className="flex">
         <button onClick={() => {
             navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`);
           }}
-          className="min-w-[5px] min-h-[40px] bg-textColor mt-[15px] cursor-pointer hover:bg-otherColor duration-500 ml-auto mr-auto "
+          className="min-w-[5px] min-h-[40px] bg-textColor mt-[15px] mb-[15px] cursor-pointer hover:bg-otherColor duration-500 ml-auto mr-auto "
         />
       </div>
 
-      <div className="flex flex-col  pt-[20px] ">
+      <div className="flex flex-col  pt-[10px] overflow-y-scroll overflow-x-hidden scrollbar-hide">
         {Object.entries(serverList || {}).map(([serverId, serverName]) => (
           <div key={serverId} className="m-auto relative group text-otherColor/50">
             <button onClick={() =>{
@@ -113,7 +114,7 @@ export function ServerListComponent() {
         <button onClick={() => {
             setserverBoxDisplay(true);
           }}
-          className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] text-otherColor/50 w-[50px] h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-otherColor/50  hover:text-otherColor/90 duration-[0.5s] cursor-pointer ">
+          className="text-[20px] bg-secondaryColor/50 border-transparent border-solid border-[2px] text-otherColor/50 w-[50px] min-h-[50px] m-auto mb-[10px] rounded-[50px] hover:border-otherColor/50  hover:text-otherColor/90 duration-[0.5s] cursor-pointer ">
           +
         </button>
 

@@ -28,7 +28,7 @@ export function SettingComponent({setsettingDisplay}){
     try {
       const formData = new FormData();
       formData.append('img', uploadedImage);
-      const updateProfile = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/me/updateProfilePicture`,formData,{
+      const updateProfile = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/updateProfilePicture`,formData,{
         withCredentials: true
       });
       if(updateProfile.data.status==="updated"){

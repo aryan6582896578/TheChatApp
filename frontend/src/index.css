@@ -11,7 +11,13 @@
   --color-otherColor: #EEEEEE;
 
 }
-
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 ::-webkit-scrollbar {
   width: 5px;
   scroll-behavior: smooth;
