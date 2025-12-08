@@ -11,11 +11,7 @@ export default function auth(app,socket,upload,redisClient){
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 auth");
         // console.log("jwt check in auth v2")
         if (validToken) {
-          const usernameValidToken = validToken.username;
-          const userIdValidToken = validToken.userId;
-          req.validUser = true,
-          req.username = usernameValidToken,
-          req.userId = userIdValidToken;
+          req.validUser = true;
         } else {
           req.validUser = false;
         }
@@ -47,7 +43,7 @@ export default function auth(app,socket,upload,redisClient){
             const timestamp = Date.now();
             try {
             await userDataModel.create({
-                _id: `${usernameData}`,
+                _id: `${userID}`,
                 username: `${usernameData}`,
                 password: `${hashedhPassword}`,
                 createdDate: `${currentDate}`,
@@ -70,7 +66,7 @@ export default function auth(app,socket,upload,redisClient){
                 { serverId: `${defaultServer}` },
                 { $push: { members: `${userID}` } }
             );
-            const createToken = signJwt(usernameData, userID,timestamp);
+            const createToken = signJwt(userID,timestamp);
             const userCreated = await userDataModel.findOne({
                 userid: `${userID}`,
             });
@@ -109,7 +105,7 @@ export default function auth(app,socket,upload,redisClient){
                                 lastUpdated:getUserdata.lastUpdated,
                                 username:usernameData
                             })
-                            const createToken = signJwt(usernameData, userID,timestamp);
+                            const createToken = signJwt(userID,timestamp);
                             res.cookie("tokenJwt", createToken, {maxAge: 15 * 24 * 60 * 60 * 1000});
                             res.json({ status: "userValid" });
                         } else {

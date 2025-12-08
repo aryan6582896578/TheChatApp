@@ -11,19 +11,17 @@ export default function user(app,socket,upload,redisClient){
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 user ");
         console.log("jwt check in user v2")
-        if (validToken.username && validToken.userId && validToken.lastUpdated) {
-          const usernameValidToken = validToken.username;
+        req.validUser=false;
+        if (validToken.userId && validToken.lastUpdated) {
           const userIdValidToken = validToken.userId;
-          req.validUser = true,
-          req.username = usernameValidToken,
-          req.userId = userIdValidToken;
           // socket.to("testserver").emit("testserver", "hmmmmmm  testserver auth");
           let redisData = await redisClient.hGetAll(userIdValidToken);
           if(Object.keys(redisData).length===0){
-            console.log(`data not cached for ${usernameValidToken}`);
+            console.log(`data not cached for ${userIdValidToken}`);
             const userData= await getUserDataId(userIdValidToken)
+
             // console.log(userData)
-            if(validToken.lastUpdated<userData.lastUpdated){
+            if(validToken.lastUpdated!=userData.lastUpdated){
               console.log("old jwt token")
               res.clearCookie("tokenJwt");
               req.validUser = false;
@@ -31,8 +29,12 @@ export default function user(app,socket,upload,redisClient){
               const setRedisData = await redisClient.hSet(userIdValidToken,{
                 userprofileurl:userData.userprofileurl,
                 lastUpdated:userData.lastUpdated,
-                username:usernameValidToken
+                username:userData.username
               })
+              req.userprofileurl=userData.userprofileurl;
+              req.validUser = true;
+              req.username = userData.username;
+              req.userId = userIdValidToken;
             }
           }else{
             // console.log("tokenn",(validToken.lastUpdated),"redis",(parseInt(redisData.lastUpdated)))
@@ -42,6 +44,9 @@ export default function user(app,socket,upload,redisClient){
               req.validUser = false;
             }else{
               req.userprofileurl=redisData.userprofileurl;
+              req.validUser = true;
+              req.username=redisData.username;
+              req.userId = userIdValidToken;
             }
             
             // console.log(redisData);
@@ -218,8 +223,46 @@ export default function user(app,socket,upload,redisClient){
         message: error.message,
       });
     }
+  }})
+  
+  router.put("/updateUsername", checkJwt, async (req, res) => {
+    const newUsername = req.body.newUsername;
+    if(req.validUser && newUsername){
+        if(newUsername.length<4){
+            res.json({status:"usernameLimitMin"})
+        }else if(newUsername.length>15){
+            res.json({status:"usernameLimitMax"})
+        }else{
+          try {
+            const updateUsername = await userDataModel.findOneAndUpdate(
+              {"username":req.username},
+              { "username":newUsername}
+            )
+            let redisData = await redisClient.hGetAll(req.userId);
+            const setRedisData = await redisClient.hSet(req.userId,{
+              userprofileurl:redisData.userprofileurl,
+              lastUpdated:redisData.lastUpdated,
+              username:newUsername
+            })
+            res.send({status:"usernameUpdated"})
+            
+          } catch (error) {
+              console.log(error,"err username exists")
+              res.send({status:"usernameExists"})
+          }
+        }
+      console.log("Trying to change username from:",req.username,"to",newUsername)
+    }
+  })    
 
-  }})    
+
+
+
+
+
+
+
+
     return router
   }
 

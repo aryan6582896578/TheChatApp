@@ -77,7 +77,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex flex-col bg-secondaryColor mt-[60px] ml-[5%] mr-[5%] h-fit rounded-[5px] sm:w-[450px] sm:ml-auto sm:mr-auto">
-            <div className="text-[50px] ml-auto mr-auto font-semibold ">Register</div>
+            <div className="text-[50px] ml-auto mr-auto font-semibold text-otherColor">Register</div>
 
             <div className="flex flex-col mb-[5px] p-[10px]">
               <div className="text-[13px] mb-[5px] font-semibold text-otherColor/80">USERNAME 

@@ -2,12 +2,44 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 
-export function SettingComponent({setsettingDisplay}){
+export function UserSettingComponent({setsettingDisplay}){
   const navigate = useNavigate();
-  const [userData, setuserData] = useState({username: null,userprofileurl: null,});
+  const [userData, setuserData] = useState({username: null,userprofileurl: null});
   const [uploadedImage, setuploadedImage] = useState(null);
-  const [uploadProfileComponentDisplay ,setuploadProfileComponentDisplay]=useState(false)
+  const [uploadProfileComponentDisplay ,setuploadProfileComponentDisplay]=useState(false);
 
+  const [newUsername,setnewUsername] = useState({newUsername:null});
+  const [usernameUpdated,setusernameUpdated]=useState(false);
+  const [usernameUpdateError,setusernameUpdateError]=useState("")
+  const [usernameLoading,setusernameLoading]=useState(false)
+  const[isUsernameUpdated,setisUsernameUpdated]=useState("")
+  async function updateUsername() {
+    if(newUsername){
+      setusernameLoading(true)
+      const putUsername = await axios.put(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/updateUsername`,newUsername,{
+            withCredentials: true});
+      if(putUsername.data.status ==="usernameExists"){
+        setusernameUpdateError(" *username in taken")
+        setusernameLoading(false)
+      }else if(putUsername.data.status==="usernameLimitMin"){
+        setusernameUpdateError(" *username cannot be less than 4 character")
+        setusernameLoading(false)
+      }else if(putUsername.data.status==="usernameLimitMax"){
+        setusernameUpdateError(" *username cannot be greater than 15 character")
+        setusernameLoading(false)
+      }else if(putUsername.data.status==="usernameUpdated"){
+        setusernameUpdateError("")
+        getUserData()
+        setusernameUpdated(false)
+        setusernameLoading(false)
+        setisUsernameUpdated("Username Updated")
+        setTimeout(()=>{
+          setisUsernameUpdated("")
+        },4000)
+      }
+    }
+    
+  }
 
   async function getUserData() {
     try {
@@ -48,9 +80,12 @@ export function SettingComponent({setsettingDisplay}){
     if(userData.username===null){
           getUserData();
     }
-
+    return ()=>{
+      setuserData({...setuserData,username:null,userprofileurl:null})
+      setnewUsername({...setnewUsername,newUsername:null})
+    }
   }, []);
-  document.title = `Settings | ${import.meta.env.VITE_NAME}`;
+  document.title = `Settings | TheChatApp`;
   return (
     <div className="w-[100%] h-[100%] fixed top-[0px] left-0 bg-primaryColor z-[10]">
       <div className="bg-primaryColor h-[70px] w-[100%]  border-b-otherColor/80 border-b-[1px] relative ">
@@ -71,7 +106,7 @@ export function SettingComponent({setsettingDisplay}){
 
       <div className="w-[100%] h-[100%] flex text-otherColor relative">
             
-            <SettingSideBarComponent logoutUser={logoutUser}/>
+        <SettingSideBarComponent logoutUser={logoutUser}/>
 
         <div className="bg-secondaryColor rounded-[5px] w-[100%] mb-[50px] p-[50px] pt-[0px] flex flex-col relative">
           <div className="text-[50px] ml-auto mr-auto flex">
@@ -79,15 +114,42 @@ export function SettingComponent({setsettingDisplay}){
           </div>
           <div>
             <div className="flex">
-              <div className="">
+              <div className="bg-secondaryColor">
                 <div className="relative">
-                  <img src={userData.userprofileurl} alt="err" className="w-[80px] h-[80px] rounded-[100%] bg-gray-900"/>
+                  <img src={userData.userprofileurl} alt="userpfp" className="w-[80px] h-[80px] rounded-[100%] bg-gray-900"/>
                   <button className=" bg-textColor w-[80%] ml-auto mr-auto flex  mt-[5px] rounded-[3px] font-semibold  hover:bg-red-500 cursor-pointer duration-[0.5s]" onClick={()=>{
                     setuploadProfileComponentDisplay(true)
                   }}>
                     <div className="flex ml-auto mr-auto">Edit</div>
                   </button>
                 </div>
+              </div>
+              <div className="flex ml-[20px] pl-[10px] pr-[10px]">
+                <div className="mb-[15px] mt-[15px] flex" >
+                  <div className="flex flex-col ">
+                    <div className="text-otherColor/90 flex font-semibold h-[20px] mb-[2px] text-[12px]">USERNAME <span className="text-red-500 ml-[5px] font-bold">{usernameUpdateError}</span> <span className="text-text1Color">{isUsernameUpdated}</span></div>
+                    <input type="text" className="bg-primaryColor p-[5px] rounded-[3px] outline-none flex h-[30px]" defaultValue={userData.username} onChange={(e)=>{
+                      if(e.target.value!=userData.username){
+                        setusernameUpdated(true)
+                        setnewUsername({...setnewUsername,newUsername:e.target.value})
+                      }else{
+                        setusernameUpdated(false)
+                      }
+                    }}/>
+                  </div>
+                  <div className="mt-[22px] ml-[10px]">
+                    <button className={`h-[30px]  w-[70px] rounded-[3px] font-semibold cursor-pointer ${usernameUpdated?"bg-red-500 hover:bg-red-500/80":"bg-primaryColor hover:bg-primaryColor/70"}`} onClick={()=>{
+                      if(setnewUsername!=userData.username){
+                        updateUsername()
+                      }
+                    }}>{usernameLoading?"Updating":usernameUpdated?"Save":"Edit"}</button>
+                  </div>
+                </div>
+                {/* <div className="mb-[15px] mt-[15px]">
+                  <input type="text" className="bg-cyan-950" />
+                  <button>Edit</button>
+                </div> */}
+                
               </div>
             </div>
           </div>

@@ -11,12 +11,9 @@ export default function serverV2(app,socket,upload,redisClient){
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 server");
         // console.log("jwt check in server v2")
         if (validToken) {
-          const usernameValidToken = validToken.username;
           const userIdValidToken = validToken.userId;
           req.validUser = true,
-          req.username = usernameValidToken,
           req.userId = userIdValidToken;
-          // console.log("ff jwt ",req.userId)
         } else {
           req.validUser = false;
         }

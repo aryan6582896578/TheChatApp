@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
-import { SettingComponent } from "./SettingComponent";
+import { UserSettingComponent } from "./UserSettingComponent";
 export function UserProfileComponent() {
   const navigate = useNavigate();
   
@@ -32,7 +32,7 @@ export function UserProfileComponent() {
         <button className="min-w-[5px] min-h-[100%] bg-textColor hover:bg-red-500 rounded-[0px] absolute end-0 cursor-pointer duration-[0.5s]" onClick={()=>{
           setsettingDisplay(true)
         }}/>
-        {settingDisplay? <SettingComponent setsettingDisplay={setsettingDisplay} /> :""}
+        {settingDisplay? <UserSettingComponent setsettingDisplay={setsettingDisplay} /> :""}
 
       </div>
     );

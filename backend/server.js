@@ -67,7 +67,7 @@ const socket = new Server(httpServer, {
 });
 
 //manageroutesimages(app,upload)
-runsocket(socket)
+runsocket(socket,redisClient)
 runroutes(app,socket,upload)
 routesv2(app,socket,upload,redisClient)
 
