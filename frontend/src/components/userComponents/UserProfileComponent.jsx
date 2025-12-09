@@ -2,23 +2,29 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { UserSettingComponent } from "./UserSettingComponent";
+import { emitter } from "../managesocket";
 export function UserProfileComponent() {
   const navigate = useNavigate();
   
-  const[userProfileInfo,setuserProfileInfo] = useState({username:null,userprofileurl:null})
+  const[userProfileInfo,setuserProfileInfo] = useState({username:null,userprofileurl:null,userId:null})
   const[settingDisplay,setsettingDisplay]=useState(false)
 
   async function getUserData() {
     const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`, {
         withCredentials: true,
       })
-      
-    setuserProfileInfo({...userProfileInfo, username:userData.data.username,userprofileurl: userData.data.userprofileurl})
+    setuserProfileInfo({...userProfileInfo, username:userData.data.username,userprofileurl: userData.data.userprofileurl,userId:userData.data.userId})
   }
   useEffect(() => {
-    
+
+    emitter.on('UserProfileComponent',(e)=>{
+      console.log(e)
+      if(e==="UserProfileComponent"){
+        getUserData();
+      }
+    })
     if(userProfileInfo.username===null){
-          getUserData();
+      getUserData();
     }
     
   }, [])

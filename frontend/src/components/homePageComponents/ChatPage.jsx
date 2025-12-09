@@ -13,7 +13,12 @@ export default function ChatPage() {
     </div>
   );
 }
-
+async function test(){
+        const x = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/test`,{
+          withCredentials: true,
+        });
+        console.log(x.data)
+} 
 function DmListComponent() {
   return (
     <div className="flex overflow-hidden flex-col bg-primaryColor min-w-[250px] ">
@@ -22,9 +27,13 @@ function DmListComponent() {
         disabled
         placeholder="Search"
       />
+      {/* <button className="w-[100px] bg-cyan-500 cursor-pointer hover:bg-cyan-700" onClick={()=>{
+        test()
+      }}>test</button> */}
       <span className="overflow-y-hidden hover:overflow-y-auto pr-[10px] h-[100%]">
       </span>
       <UserProfileComponent />
+      
     </div>
   );
 }

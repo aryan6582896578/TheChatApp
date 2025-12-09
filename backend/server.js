@@ -50,7 +50,7 @@ app.use(cookieParser(),
 );
 app.use(express.json({}), express.urlencoded({extended: true,limit: '10mb'}));
 
-const socket = new Server(httpServer, {
+const io = new Server(httpServer, {
   cors: {
     origin: `${process.env.FRONTEND_URL}`,
     credentials: true,
@@ -67,9 +67,9 @@ const socket = new Server(httpServer, {
 });
 
 //manageroutesimages(app,upload)
-runsocket(socket,redisClient)
-runroutes(app,socket,upload)
-routesv2(app,socket,upload,redisClient)
+runsocket(io,redisClient)
+runroutes(app,io,upload)
+routesv2(app,io,upload,redisClient)
 
 async function runServer() {
   try {

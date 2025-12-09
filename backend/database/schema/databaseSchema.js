@@ -51,7 +51,7 @@ const messageData = mongoose.Schema({
     userId: {type:String,required: true},
     displayDate:{type:String,required: true},
     message:{type:String,required: true},
-    username:{type:String,required: true},
+    // username:{type:String,required: true},
 },{ timestamps: true })
 const messageDataModel = mongoose.model("messageData", messageData);
 

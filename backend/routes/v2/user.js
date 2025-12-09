@@ -6,7 +6,7 @@ import { createCustomId } from "../../database/managedata/customData.js";
 import uploadImage from "../../database/managedata/imageData.js";
 const router = express.Router({ mergeParams: true })
 
-export default function user(app,socket,upload,redisClient){
+export default function user(app,io,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 user ");
@@ -47,6 +47,8 @@ export default function user(app,socket,upload,redisClient){
               req.validUser = true;
               req.username=redisData.username;
               req.userId = userIdValidToken;
+              const something = "haha user"
+              
             }
             
             // console.log(redisData);
@@ -121,7 +123,8 @@ export default function user(app,socket,upload,redisClient){
           { channelId: `${channelId}` },
           { $push: { members: `${userId}` } }
         );
-
+        const updateData = {type:"ServerListComponent"}
+        io.to(`${req.userId}`).emit(`${req.userId}`,updateData);
         res.json({ status: "CreatedServer", serverId: `${serverId}` });
       } catch (error) {
         console.log(error, "error in creating server ");
@@ -132,6 +135,7 @@ export default function user(app,socket,upload,redisClient){
   router.get("/serverList", checkJwt, async (req, res) => {
     if (req.validUser) {
       const userDataSevers = await userDataSeverList(req.username);
+      
       res.json({ serverList: userDataSevers , username:req.username});
     }
   });
@@ -174,6 +178,8 @@ export default function user(app,socket,upload,redisClient){
                   { $push: { members: `${getUserid}` } }
                 );
               });
+              const updateData = {type:"ServerListComponent"}
+              io.to(`${req.userId}`).emit(`${req.userId}`,updateData);
               res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
             }
           } else {
@@ -184,6 +190,7 @@ export default function user(app,socket,upload,redisClient){
         }
       }
     });
+
   router.post("/updateProfilePicture", checkJwt, async (req, res) => {
       async function runMiddleware(req, res, fn) {
         return new Promise((resolve, reject) => {
@@ -214,8 +221,9 @@ export default function user(app,socket,upload,redisClient){
               lastUpdated:redisData.lastUpdated,
               username:redisData.username
             })
-            // socket.to(`${req.userId}`).emit(`${req.userId}`, "profile updated");
-            console.log("pfp updated",setRedisData)
+            console.log("pfp updated",redisData)
+            const updateData = {type:"UserProfileComponent"}
+            io.to(`${req.userId}`).emit(`${req.userId}`,updateData);
             res.json({status:"updated"});
     } catch (error) {
       console.log(error);
@@ -244,6 +252,8 @@ export default function user(app,socket,upload,redisClient){
               lastUpdated:redisData.lastUpdated,
               username:newUsername
             })
+            const updateData = {type:"UserProfileComponent"}
+            io.to(`${req.userId}`).emit(`${req.userId}`,updateData);
             res.send({status:"usernameUpdated"})
             
           } catch (error) {
@@ -253,15 +263,15 @@ export default function user(app,socket,upload,redisClient){
         }
       console.log("Trying to change username from:",req.username,"to",newUsername)
     }
-  })    
-
-
-
-
-
-
-
-
+  })
+  // router.get("/test", checkJwt, async (req, res) => {
+  //   const userId = req.userId
+  //   console.log(userId)
+  //   const updateData = {"userId":userId}
+  //   console.log(updateData)
+  //   io.to(`${userId}`).emit(`${userId}`,updateData);
+  //   res.send({"status":updateData})
+  // })     
 
     return router
   }

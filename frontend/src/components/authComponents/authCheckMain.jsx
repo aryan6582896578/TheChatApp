@@ -14,10 +14,11 @@ export default function AuthCheckMain() {
     if(userData.data.status === "userValid"){
       setuserStatus(true);
       const jwtToken = getJwtCookie();
-      socket.emit("joinUserUpdates",{jwtToken});
-      // socket.on(userInfo,(x)=>{
-      //   console.log("yess",x);
+      // socket.emit("joinUserUpdates",{jwtToken});
+      // socket.on(userData.data.userId,async(data)=>{
+      //   console.log("yess",data);
       // })
+      // socket.emit(userData.data.userId,"yep frontend");
     }else{
       socket.disconnect();
       navigate(`/${import.meta.env.VITE_VERSION_LIVE}/login`);

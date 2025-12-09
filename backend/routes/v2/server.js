@@ -5,7 +5,7 @@ import { inviteDataModel, messageDataModel, serverChannelsDataModel, serverDataM
 import { createCustomId } from "../../database/managedata/customData.js";
 import { channelPermissionCheck } from "./other.js";
 const router = express.Router({ mergeParams: true })
-export default function serverV2(app,socket,upload,redisClient){
+export default function serverV2(app,io,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 server");
@@ -258,10 +258,12 @@ export default function serverV2(app,socket,upload,redisClient){
                 username: getUserDataDb.username,
               });
               const userprofileurl = getUserDataDb.userprofileurl;
-              return [userMessage, userprofileurl ];
+              const username = getUserDataDb.username
+              return [userMessage, [userprofileurl,username] ];
             } else {
               const userprofileurl = getRedisData.userprofileurl;
-              return [userMessage, userprofileurl ];
+              const username = getRedisData.username
+              return [userMessage, [userprofileurl, username]];
             }
           })
         ) 
@@ -273,24 +275,28 @@ export default function serverV2(app,socket,upload,redisClient){
           channelId:channelId,
         }).sort({createdAt:-1}).limit(20)
         let sendMessage = getMessages.reverse()
+        console.log("initial load")
 
         sendMessage = await Promise.all(
           sendMessage.map(async (userMessage)=>{
             // console.log(userMessage.userId)
             let getRedisData = await redisClient.hGetAll(userMessage.userId);
+            // console.log(getRedisData)
             if (Object.keys(getRedisData).length === 0) {
               const getUserDataDb = await getUserDataId(userMessage.userId);
-              console.log(getUserDataDb)
+              console.log(getUserDataDb,"hmmm")
               const setRedisData = await redisClient.hSet(userMessage.userId, {
                 userprofileurl: getUserDataDb.userprofileurl,
                 lastUpdated: getUserDataDb.lastUpdated,
                 username: getUserDataDb.username,
               });
               const userprofileurl = getUserDataDb.userprofileurl;
-              return [userMessage, userprofileurl ];
+              const username = getUserDataDb.username
+              return [userMessage, [userprofileurl,username] ];
             } else {
               const userprofileurl = getRedisData.userprofileurl;
-              return [userMessage, userprofileurl ];
+              const username = getRedisData.username
+              return [userMessage, [userprofileurl, username]];
             }
           })
         ) 

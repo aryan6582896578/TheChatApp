@@ -3,14 +3,16 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import "./index.css";
 import HomePage from "./components/homePageComponents/HomePage.jsx";
 import ErrorPage from "./components/otherComponents/ErrorPage.jsx";
-import AuthCheckMain from "./components/authComponents/authCheckMain.jsx";
-import AuthCheckPre from "./components/authComponents/authCheckPre.jsx";
+import AuthCheckMain from "./components/authComponents/AuthCheckMain.jsx";
+import AuthCheckPre from "./components/authComponents/AuthCheckPre.jsx";
 import ChatPage from "./components/homePageComponents/chatPage.jsx";
 import RegisterPage from "./components/authComponents/RegisterPage.jsx"
-import AuthCheckRoute from "./components/authComponents/authCheckRoute.jsx"
+import AuthCheckRoute from "./components/authComponents/AuthCheckRoute.jsx"
 import MainChatPage from "./components/chatPageComponents/MainChatPage.jsx"
 import LoginPage from "./components/authComponents/LoginPage.jsx";
-import { socket } from "./components/managesocket.js";
+import { emitter, socket } from "./components/managesocket.js";
+import axios from "axios";
+
 
 let container = null;
 document.addEventListener("DOMContentLoaded",async function (event) {
@@ -27,10 +29,25 @@ document.addEventListener("DOMContentLoaded",async function (event) {
       const jwtToken = getJwtCookie()
       socket.auth = {jwtToken}
     }
+    async function getUserData() {
+      const userData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me`, {
+          withCredentials: true,
+        })
+      return userData.data.userId
+    }
     setSocketData();
     if (!socket.connected) {
       socket.connect();
     }
+    const userId=await getUserData();
+    const jwtToken = getJwtCookie();
+      socket.emit("joinUserUpdates", { jwtToken});
+      socket.on(`${userId}`,async (userData)=>{
+        console.log(userData.type)
+        emitter.emit(`${userData.type}`, userData.type)    
+      })
+
+    
     root.render(
       
       <BrowserRouter>

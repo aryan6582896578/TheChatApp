@@ -13,7 +13,7 @@ export default function AuthCheckMain() {
     const serverData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${serverId}/permissionCheckServer`, {
       withCredentials: true,
     })
-    console.log(socket.connected)
+    // console.log(socket.connected)
     if(!socket.connected){
       socket.connect();
     }

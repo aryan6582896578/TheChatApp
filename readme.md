@@ -16,10 +16,11 @@
 - ~~update username~~
 - update password  
 - add auto retry later
+- delete message
 
 
 > ### frontend TODO
-```
-fix ui
-create event bus
-```
+- fix ui
+- ~~user update event bus~~
+- server changes event bus~~
+- delete message ui update

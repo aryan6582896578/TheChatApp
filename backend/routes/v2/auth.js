@@ -5,7 +5,7 @@ import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../d
 import { createCustomId } from "../../database/managedata/customData.js";
 const router = express.Router({ mergeParams: true })
 
-export default function auth(app,socket,upload,redisClient){
+export default function auth(app,io,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
         const validToken = verifyJwt(req.cookies.tokenJwt , "v2 auth");

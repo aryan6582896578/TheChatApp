@@ -187,7 +187,6 @@ function UploadProfileComponent({setuploadProfileComponentDisplay,userData,setup
             {selectedImage?`Selected ${uploadedImagePreview.name}`:"Select Image"}
           </label>
           <input type="file"id="filebox"className="hidden max-w-[120px]  "accept="image/png, image/jpeg" onChange={(e) => {
-            console.log("hm");
               setuploadedImage(e.target.files[0]);
               setuploadedImagePreview({...setuploadedImagePreview,name:e.target.files[0].name,url:URL.createObjectURL(e.target.files[0])});
               setselectedImage(true);

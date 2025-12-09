@@ -108,14 +108,14 @@ export function ChatBoxComponent({userId}) {
         }
       }}>
         <div className=" flex flex-col bg-primaryColor p-[5px] pb-0 ">
-          {displayMessageDbOld.map(([userMessage, userprofileurl ])=>{
+          {displayMessageDbOld.map(([userMessage, [userprofileurl,username] ])=>{
             return(
               <div className="bg-primaryColor min-h-[60px] flex hover:bg-secondaryColor cursor-pointer rounded-[5px]" key={userMessage["_id"]}  >  
                 <div className="h-[50px] w-[50px] mt-[5px] mr-[5px] p-[5px]">
-                  <img src={userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={userMessage.username}/>
+                  <img src={userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={username}/>
                 </div>
                 <div className="w-full">
-                  <div className="text-otherColor">{userMessage.username} <span className="text-otherColor/40 text-[10px]">{userMessage.displayDate}</span></div>
+                  <div className="text-otherColor">{username} <span className="text-otherColor/40 text-[10px]">{userMessage.displayDate}</span></div>
                   <div className="text-otherColor break-all wrap-break-word mr-[5px]">{userMessage.message}</div>
                 </div>
               </div>
@@ -123,14 +123,14 @@ export function ChatBoxComponent({userId}) {
           })}
         </div>
         <div className=" flex flex-col bg-primaryColor p-[5px] pb-0 ">
-          {displayMessageDb.map(([userMessage, userprofileurl ])=>{
+          {displayMessageDb.map(([userMessage, [userprofileurl,username] ])=>{
             return(
               <div className="bg-primaryColor min-h-[60px] flex hover:bg-secondaryColor cursor-pointer rounded-[5px]" key={userMessage["_id"]}  >  
                 <div className="h-[50px] w-[50px] mt-[5px] mr-[5px] p-[5px]">
-                  <img src={userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={userMessage.username}/>
+                  <img src={userprofileurl} className="w-[100%] h-[100%] rounded-[100%] object-fill " draggable={false} alt={username}/>
                 </div>
                 <div className="w-full">
-                  <div className="text-otherColor">{userMessage.username} <span className="text-otherColor/40 text-[10px]">{userMessage.displayDate}</span></div>
+                  <div className="text-otherColor">{username} <span className="text-otherColor/40 text-[10px]">{userMessage.displayDate}</span></div>
                   <div className="text-otherColor break-all wrap-break-word mr-[5px]">{userMessage.message}</div>
                 </div>
               </div>

@@ -88,40 +88,50 @@ export default async function runsocket(io, redisClient) {
             console.log(socket.serverId, socket.channelId, "FF");
             const count = io.engine.clientsCount;
             console.log("Online total ", count);
-            const onlineUserCount =
-              io.sockets.adapter.rooms.get(
-                `${socket.serverId}/${socket.channelId}`
-              )?.size || 0;
-            io.to(`${socket.serverId}/${socket.channelId}`).emit(
-              `${socket.serverId}/${socket.channelId}`,
-              messageData,
-              onlineUserCount
-            );
+            const onlineUserCount =io.sockets.adapter.rooms.get(`${socket.serverId}/${socket.channelId}`)?.size || 0;
+            io.to(`${socket.serverId}/${socket.channelId}`).emit(`${socket.serverId}/${socket.channelId}`,messageData,onlineUserCount);
           } catch (error) {
             console.log("error sending || saving message", error);
           }
         }
       }); //
-    });
+      });
+
+      socket.on("joinUserUpdates", async ({jwtToken})=>{
+        const validToken = verifyJwt(jwtToken , "v2 socket join user updates");
+        if(validToken){
+        let redisData = await redisClient.hGetAll(validToken.userId);
+        if (Object.keys(redisData).length === 0) {
+          console.log(`data not cached for ${validToken.userId} in socket connection userUpdates`);
+          const userData = await getUserDataId(validToken.userId);
+          if (validToken.lastUpdated != userData.lastUpdated) {
+            console.log("invalid user in socket connection userUpdates",validToken.userId);
+            res.clearCookie("tokenJwt");
+          }else{
+            const setRedisData = await redisClient.hSet(validToken.userId,{
+              userprofileurl: userData.userprofileurl,
+              lastUpdated: userData.lastUpdated,
+              username: userData.username,
+            });
+            socket.join(`${validToken.userId}`);
+            console.log(userData.username,"joined userUpdates");
+          }
+        }else{
+          if(validToken.lastUpdated != parseInt(redisData.lastUpdated)) {
+            console.log("invalid user in socket connection userUpdates",validToken.userId);
+            res.clearCookie("tokenJwt");
+
+          }else{
+            socket.username = redisData.username;
+            socket.join(`${validToken.userId}`);
+            console.log(redisData.username,"joined userUpdates");
+          }
+        }
+        }
+      })
     }
   });
-  
+ 
 }
-// socket.on("joinUserUpdates", async ({jwtToken})=>{
-//   const validToken = verifyJwt(jwtToken , "v2 socket join user updates");
-//   if(validToken){
-//     socket.validUser = true;
-//     socket.userId = validToken.userId;
-//     socket.username = validToken.username;
-//     socket.join(`${socket.userId}`);
-//     console.log(`USER - ${socket.username} joined user updates`)
-//   }
-//   socket.on(`${socket.userId}`,(data)=>{
-//     if(socket.validUser){
-//       console.log(data);
-//       console.log("backend user update socket ")
-//       io.to(`${socket.userId}`).emit(`${socket.userId}`, "backend user update socket ");
-//     }
-//   })
 
-// })
+
