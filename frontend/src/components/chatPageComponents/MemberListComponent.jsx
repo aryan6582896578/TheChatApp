@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
+import { emitter } from "../managesocket";
 export function MemberListComponent({displayMemberListComponent}){
   const parms = useParams();
-  const [membersId, setmembersId] = useState([]);
-  const [membersData, setmembersData] = useState([]);
   const[memberListData,setmemberListData]=useState([]);
 
   async function getMemberList() {
@@ -13,15 +12,21 @@ export function MemberListComponent({displayMemberListComponent}){
         withCredentials: true,
       });
       setmemberListData(Object.entries(channelMemberList.data.usernameList))
-      // console.log(channelMemberList.data.usernameList)
-      // console.log(Object.keys(channelMemberList.data.usernameList))
-      // setmembersId(Object.keys(channelMemberList.data.usernameList))
-      // setmembersData(Object.values(channelMemberList.data.usernameList))
     }   
   }
   useEffect(() => {
     getMemberList()
   }, [parms.serverId,parms.channelId])
+
+  useEffect(() => {
+    emitter.on("updateMemberList",(updateData)=>{
+      // console.log(updateData)
+      if(updateData.refresh==="serverMemberList"){
+        getMemberList();
+      }
+    })
+  }, [])
+  
   
     return(
       <div className={`h-[100%] min-w-fit bg-primaryColor flex flex-col ${displayMemberListComponent?"block":"hidden"}`}>

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useEffectEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
+import { emitter } from "../managesocket";
 export default function ChannelListComponent(){
     const navigate = useNavigate();
     const parms = useParams();
@@ -54,6 +55,14 @@ export default function ChannelListComponent(){
         setchannelName([])
       }
     }, [parms.serverId])
+    useEffect(() => {
+      emitter.on("updateChannelList",(updateData)=>{
+        if(updateData.refresh==="serverChannelList"){
+          getServerData()
+          getChannelData()
+        }
+      })
+    }, [])
       
       return (
         <div className=" sm:w-[250px] h-[100%]  flex flex-col pt-[10px] relative bg-primaryColor">

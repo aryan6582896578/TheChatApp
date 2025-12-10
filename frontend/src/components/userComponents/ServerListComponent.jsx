@@ -14,7 +14,7 @@ export function ServerListComponent() {
   const [createServerError,setcreateServerError]=useState("");
 
   const [serverJoinBoxDisplay,setserverJoinBoxDisplay]=useState(false);
-  const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: "" });
+  const[joinServerData , setjoinServerData] =  useState({ serverInviteCode: null });
   const[serverJoinError,setserverJoinError]=useState("");
 
 
@@ -57,18 +57,21 @@ export function ServerListComponent() {
     if(joinServerData.serverInviteCode){
       try {
         const joinServer = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/joinServer`,joinServerData,{
-        withCredentials: true
-      })
-      if(joinServer.data.status==="alreadyJoined"){
-        setserverJoinBoxDisplay(false);
-        await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
-      }else if(data.data.status==="ServerJoined"){
-        await navigate(`/${import.meta.env.VITE_VERSION}/@me/chat/${data.data.serverId}`);
-      }else{
-        setserverJoinError("*invalid code");
-      }
+          withCredentials: true
+        })
+        if(joinServer.data.status==="alreadyJoined"){
+          setserverJoinBoxDisplay(false);
+          setjoinServerData({joinServerData,serverInviteCode:null})
+          await navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${joinServer.data.serverId}`);
+        }else if(joinServer.data.status==="ServerJoined"){
+          setjoinServerData({joinServerData,serverInviteCode:null})
+          await navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${joinServer.data.serverId}`);
+        }else{
+          setjoinServerData({joinServerData,serverInviteCode:null})
+          setserverJoinError("*invalid code");
+        }
       } catch (error) {
-        console.log("error post server join");
+        console.log("error post server join",error);
       }
       
     }

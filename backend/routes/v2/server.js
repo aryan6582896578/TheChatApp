@@ -217,7 +217,8 @@ export default function serverV2(app,io,upload,redisClient){
             { serverId: `${serverId}` },
             { $push: { channels: `${channelId}` } }
           );
-          
+          const updateData = {type:"MainChatPage",refresh:"serverChannelList"}
+          io.to(`${serverId}`).emit(`${serverId}`,updateData);
           res.json({ status: "channelCreated", channelId: `${channelId}` });
         } else {
           res.json({ status: "invalidUser" });
@@ -307,5 +308,42 @@ export default function serverV2(app,io,upload,redisClient){
       res.json({status:"invalidServer"})
     }
   });
+
+  router.put("/updateServerName/:serverId",checkJwt,async (req, res) => {
+      const serverId = req.params.serverId;
+      const newServerName= req.body.newName;
+      if (req.validUser && serverId) {
+        const serverData = await getServerData(serverId);
+        if (serverData) {
+          if(serverData.admins.includes(req.userId)){
+            try {
+              const updateServerName = await serverDataModel.findOneAndUpdate(
+                {"serverId":serverId},
+                {"name":newServerName}
+              )
+              res.send({status:"serverNameUpdated"})
+              const updateData = {type:"MainChatPage",refresh:"serverName"}
+              io.to(`${serverId}`).emit(`${serverId}`,updateData);
+              console.log(`Server [${serverData.serverId}] Name Updated from ${serverData.name} to ${newServerName}`)
+
+            } catch (error) {
+                res.send({status:"internalServerError"})
+            }
+          }else{
+            res.send({status:"invalidUser"})
+          }
+        }else{
+          res.send({status:"invalidServer"})
+        } 
+      }else{
+        res.send({status:"invalidUser"})
+      }
+    }
+  );
+
+
+
+
+
     return router
 }

@@ -97,7 +97,7 @@ export function ChatBoxComponent({userId}) {
       setdisplayMessageDb([])
       setdisplayMessageDbOld([])
     }
-  }, [parms.serverId,parms.channelId,onload])
+  }, [parms.serverId,parms.channelId])
 
 
   return (

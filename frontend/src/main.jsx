@@ -41,11 +41,10 @@ document.addEventListener("DOMContentLoaded",async function (event) {
     }
     const userId=await getUserData();
     const jwtToken = getJwtCookie();
-      socket.emit("joinUserUpdates", { jwtToken});
-      socket.on(`${userId}`,async (userData)=>{
-        console.log(userData.type)
-        emitter.emit(`${userData.type}`, userData.type)    
-      })
+    socket.emit("joinUserUpdates", { jwtToken});
+    socket.on(`${userId}`,async (userData)=>{
+      emitter.emit(`${userData.type}`, userData.type)    
+    })
 
     
     root.render(

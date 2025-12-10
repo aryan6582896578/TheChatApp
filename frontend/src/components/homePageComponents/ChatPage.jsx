@@ -13,12 +13,12 @@ export default function ChatPage() {
     </div>
   );
 }
-async function test(){
-        const x = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/test`,{
-          withCredentials: true,
-        });
-        console.log(x.data)
-} 
+// async function test(){
+//         const x = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/@me/test`,{
+//           withCredentials: true,
+//         });
+//         console.log(x.data)
+// } 
 function DmListComponent() {
   return (
     <div className="flex overflow-hidden flex-col bg-primaryColor min-w-[250px] ">

@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
-import { socket } from "../managesocket";
+import { emitter, socket } from "../managesocket";
 export function ServerSettingComponent() {
   const parms = useParams();
   const [serverInfo, setserverInfo] = useState({serverName:"Loading...",serverInviteCode:false});
@@ -35,53 +35,23 @@ export function ServerSettingComponent() {
 
   }
 
-  function getJwtCookie(){  
-      const cookie = document.cookie.match(/(?:^|;\s*)tokenJwt=([^;]*)/);
-      if(cookie){
-        return cookie[1]
-      }
-    }
-  const[updateFromServer,setupdateFromServer]=useState("");
   useEffect(() => {
     getServerData();
     setserverSettingDisplay(false);
-    const jwtToken = getJwtCookie();
-    const serverId = parms.serverId;
-    const channelId = parms.channelId;
-
-    // socket.emit("joinServer", { jwtToken,serverId,channelId},()=>{
-    //   socket.on(`${serverId}`,async (data)=>{
-    //     console.log(messageData)
-    //     setupdateFromServer(data)
-    //   })
-    // });
-    // socket.emit("joinServer", { jwtToken,serverId,channelId});
-    //     socket.on(`${serverId}`,async (data)=>{
-    //     console.log(messageData)
-    //     setupdateFromServer(data)
-    //   })
-
-    // if(socket.connected){
-    //   setsocketConnection(true)
-    // }
-    // return ()=>{
-    //   setadminCheck(false);
-    //   setserverSettingDisplay(false);
-    //   // socket.off(`${parms.serverId}`)
-    //   setsocketConnection(false)
-    // }
-    
   },[parms.serverId]);
 
   useEffect(() => {
-    socket.off(`${parms.serverId}`);
-    getServerData()
+    emitter.on("updateName",(updateData)=>{
+      // console.log(updateData)
+      if(updateData.refresh==="serverName"){
+        getServerData();
+      }
+    })
+  }, [])
   
-  }, [updateFromServer])
   
   
-  
-  // document.title =`${serverInfo.serverName} | ${import.meta.env.VITE_NAME}`
+
 
   return (
     <div className="sm:w-[250px] h-[45px] bg-primaryColor relative flex overflow-hidden flex-col text-otherColor">
@@ -100,7 +70,7 @@ export function ServerSettingComponent() {
 function ServerSettingDisplay({setserverSettingDisplay,createServerInvite,serverInfo}) {
   const [serverProfileDisplay,setserverProfileDisplay]=useState({display:true})
   const [inviteCodeDisplay,setinviteCodeDisplay]=useState({display:false})
-
+  // document.title =` Settings | ${serverInfo.serverName}`
   return (
     <div className="fixed w-[100%] h-screen bg-primaryColor top-[0px] bg-opacity-[99%] z-[1000] end-0">
       
@@ -110,20 +80,20 @@ function ServerSettingDisplay({setserverSettingDisplay,createServerInvite,server
             <span className="opacity-[80%] hover:opacity-[100%] hover:cursor-pointer ">{serverInfo.serverName}'s Server</span>
             
           </div>
-          <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] bg-red-600 rounded-[10px] hover:bg-textColor duration-[0.4s]" onClick={() => {
+          <button className="end-[10px] top-[10px] absolute min-w-[5px] min-h-[45px] cursor-pointer rounded-[10px] bg-red-500 hover:bg-red-500/80" onClick={() => {
             setserverSettingDisplay(false);
           }}/>    
         </div>   
       </div>
       
       <div className="bg-black flex w-[100%] h-[100%]">
-        <div className="bg-primaryColor w-[10%] h-[100%] flex flex-col pt-[20px]">
-          <button className={` ml-auto mr-auto p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] ${serverProfileDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
+        <div className="bg-primaryColor w-[15%] h-[100%] flex flex-col pt-[20px]">
+          <button className={` ml-[5px] mr-[5px] cursor-pointer p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] ${serverProfileDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
             setserverProfileDisplay({...serverProfileDisplay,display:true})
             setinviteCodeDisplay({...inviteCodeDisplay,display:false})
           }}>Server Profile
           </button>
-          <button className={` ml-auto mr-auto p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] ${inviteCodeDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
+          <button className={` ml-[5px] mr-[5px] cursor-pointer p-[5px] pr-[15px] rounded-[3px] font-bold pl-[15px] text-[15px] mb-[5px] hover:bg-secondaryColor/80 ${inviteCodeDisplay.display?"bg-secondaryColor":""}`} onClick={()=>{
             setserverProfileDisplay({...serverProfileDisplay,display:false})
             setinviteCodeDisplay({...inviteCodeDisplay,display:true})
             {serverInfo.serverInviteCode?"":createServerInvite()}   
@@ -147,33 +117,39 @@ function ServerSettingDisplay({setserverSettingDisplay,createServerInvite,server
 }
 
 function ServerProfileSSC({serverInfo,setserverSettingDisplay}){
-  const [serverNameChange,setserverNameChange]=useState(false)
-  const[serverName,setServerName]=useState(serverInfo.serverName);
-  const sendUpdatedName = {"name":serverName}
   const parms = useParams();
-  const[loading,setloading]=useState(false)
-    async function updateServer(){
-    const updateServerName = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/updateServerName/${parms.serverId}`,sendUpdatedName,{
-          withCredentials: true,
-        })
-    if(updateServerName.status==="updated"){
-      setServerName(updateServerName.name)
-      setserverNameChange(false)
-    }else{
-      setserverSettingDisplay(false)
+  const[newServerName,setnewServerName]=useState({newName:null})
+  const[isServerNameUpdated,setisServerNameUpdated]=useState(false)
+  const[serverNameLoading,setserverNameLoading]=useState(false)
+  async function updateServer(){
+    if(newServerName){
+      setserverNameLoading(true)
+      const updateServerName = await axios.put(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/updateServerName/${parms.serverId}`,newServerName,{
+        withCredentials: true,
+      })
+      if(updateServerName.data.status==="serverNameUpdated"){
+        setserverNameLoading(false)
+        setserverSettingDisplay(false)
+      }
     }
-    }
+  }
   return(
-    <div className="w-[100%] h-[100%]">
-      <div className="m-[20px]">
-      <input className="rounded-[3px] bg-primaryColor w-[200px] h-[30px] p-[5px] text-otherColor font-medium outline-none hover:cursor-pointer" disabled={loading?true:false}  defaultValue={serverName} onChange={(e)=>{
-        setServerName(e.target.value)
-        setserverNameChange(true)
-      }}/>
-      <button className={`ml-[5px] w-[100px] font-medium ${serverNameChange?"bg-red-500":"bg-textColor"} h-[30px] rounded-[3px] `} onClick={()=>{
-        setloading(true)
-        updateServer()
-      }}>{serverNameChange?"SAVE":"EDIT"}</button>
+    <div className="w-[100%] h-[100%] flex">
+      <div className=" h-[100px] w-full flex p-[20px]">
+        <div className="flex flex-col">
+          <div className="min-h-[20px] max-h-[20px] font-semibold text-[12px] text-otherColor/80">SERVER NAME</div>
+          <input type="text" className="bg-primaryColor h-[30px] pl-[5px] outline-none rounded-[3px] font-semibold" defaultValue={serverInfo.serverName} onChange={(e)=>{
+            if(serverInfo.serverName!=e.target.value){
+              setnewServerName({...newServerName,newName:e.target.value})
+              setisServerNameUpdated(true)
+            }else{
+              setisServerNameUpdated(false)
+            }
+          }}/>
+        </div>
+        <button disabled={serverNameLoading} className={`h-[30px] mt-[20px] w-[100px] font-semibold rounded-[3px] pl-[20px] pr-[20px] ml-[10px]  bg-primaryColor cursor-pointer ${isServerNameUpdated?"bg-red-500 hover:bg-red-500/80":"bg-primaryColor hover:bg-primaryColor/70"}`}  onClick={()=>{
+          updateServer()
+        }}>{serverNameLoading?"Updating":isServerNameUpdated?"Save":"Edit"}</button>
       </div>
 
     </div>
@@ -183,14 +159,12 @@ function ServerProfileSSC({serverInfo,setserverSettingDisplay}){
 function InviteCodeSSC({serverInfo}){
    const parms = useParams();
   const[copyCode,setcopyCode]=useState(false)
-  const[saveButton,setsaveButton]=useState(false)
-  async function updateServerPermission(){
-    const updatePermission = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/updateServerPermission/${parms.serverId}/inviteCodeEveryone`,"hm cannot send without body",{
-          withCredentials: true,
-        })
-
-
-  }
+  // const[saveButton,setsaveButton]=useState(false)
+  // async function updateServerPermission(){
+  //   const updatePermission = await axios.post(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION}/updateServerPermission/${parms.serverId}/inviteCodeEveryone`,"hm cannot send without body",{
+  //         withCredentials: true,
+  //   })
+  // }
 
   return(
     <div>
@@ -207,7 +181,7 @@ function InviteCodeSSC({serverInfo}){
         }}>{copyCode?"Copied":"Copy"}</button>
         
       </div>
-      <div className="flex p-[10px]">
+      {/* <div className="flex p-[10px]">
         <div className="bg-primaryColor p-[5px] rounded-[3px]">
           @everyone to create invite code
           <input disabled type="checkbox" className="w-[50px]" onChange={()=>{
@@ -217,7 +191,7 @@ function InviteCodeSSC({serverInfo}){
         <button disabled className={`ml-[5px] w-[80px] font-medium  ${saveButton?"bg-red-500":"bg-textColor"} h-[35px] rounded-[3px]`} onClick={()=>{
           updateServerPermission()
         }}>Save</button>
-      </div>
+      </div> */}
     </div>
   )
 }

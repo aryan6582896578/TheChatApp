@@ -180,6 +180,8 @@ export default function user(app,io,upload,redisClient){
               });
               const updateData = {type:"ServerListComponent"}
               io.to(`${req.userId}`).emit(`${req.userId}`,updateData);
+              const updateData01 = {type:"MainChatPage",refresh:"serverMemberList"}
+              io.to(`${serverInviteCode.serverId}`).emit(`${serverInviteCode.serverId}`,updateData01);
               res.json({status: "ServerJoined",serverId: `${serverInviteCode.serverId}`,});
             }
           } else {

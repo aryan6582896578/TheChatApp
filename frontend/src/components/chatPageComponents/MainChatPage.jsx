@@ -8,6 +8,7 @@ import ChannelHeadComponent from "./ChannelHeadComponent.jsx";
 import { ChatBoxComponent } from "./ChatBoxComponent.jsx";
 import { MemberListComponent } from "./MemberListComponent.jsx";
 import { UserProfileComponent } from "../userComponents/UserProfileComponent.jsx";
+import { emitter, getJwtCookie, socket } from "../managesocket.js";
 
 export default function MainChatPage() {
   const [channelCheck, setchannelCheck] = useState(false);
@@ -51,6 +52,24 @@ export default function MainChatPage() {
   useEffect(() => {
     getChannelData();
   }, [parms.serverId, parms.channelId]);
+  useEffect(() => {
+    const serverId = parms.serverId;
+    socket.on(`${serverId}`,async (serverData)=>{
+      console.log(serverData,"hmm")
+      if(serverData.type==="MainChatPage"){
+        if(serverData.refresh==="serverName"){
+          emitter.emit("updateName",serverData)
+        }else if(serverData.refresh==="serverMemberList"){
+          emitter.emit("updateMemberList",serverData)
+        }else if(serverData.refresh==="serverChannelList"){
+          emitter.emit("updateChannelList",serverData)
+        }
+      }  
+    })
+    return () => {
+      socket.off(`${parms.serverId}`);
+    }
+  }, [])
 
   if(channelCheck){ 
   return (
