@@ -27,9 +27,7 @@ redisClient.on('error', err => console.log('Redis Client Error', err));
 await redisClient.connect();
 if(redisClient.isReady){
   console.log("connected to redis")
-  
 }
-
 function flushCache(){
   redisClient.flushAll();
   console.log("cache flushed")

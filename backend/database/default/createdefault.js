@@ -19,7 +19,7 @@ export default async function createDefaultData(){
                     admins:[{type:Array}],
                     createdDate: `${currentDate}`,
                     serverId:"7326033090969600000",
-
+                    isDeleted:false,
                 })
 
                 await serverChannelsDataModel.create({
@@ -28,6 +28,7 @@ export default async function createDefaultData(){
                     createdDate: currentDate,
                     channelId:"7326033090969690000",
                     serverId:"7326033090969600000",
+                    isDeleted:false,
                    })
 
                 await serverDataModel.findOneAndUpdate(

@@ -88,6 +88,7 @@ export default function user(app,io,upload,redisClient){
           createdDate: `${currentDate}`,
           ownerId: `${userId}`,
           serverId: `${serverId}`,
+          isDeleted:false,
         });
 
         const channelId = createCustomId();
@@ -98,6 +99,7 @@ export default function user(app,io,upload,redisClient){
           createdDate: `${currentDate}`,
           channelId: `${channelId}`,
           serverId: `${serverId}`,
+          isDeleted:false,
         });
         
         await serverDataModel.findOneAndUpdate(

@@ -41,6 +41,7 @@ export default function MainChatPage() {
           if (data[0]) {
             navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}/${data[0]}`);
           }else{
+            setchannelCheck(false);
             navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);
           }
         }
@@ -61,7 +62,7 @@ export default function MainChatPage() {
           emitter.emit("updateName",serverData)
         }else if(serverData.refresh==="serverMemberList"){
           emitter.emit("updateMemberList",serverData)
-        }else if(serverData.refresh==="serverChannelList"){
+        }else if(serverData.refresh === "serverChannelList"){
           emitter.emit("updateChannelList",serverData)
         }
       }  
@@ -71,7 +72,7 @@ export default function MainChatPage() {
     }
   }, [])
 
-  if(channelCheck){ 
+
   return (
     <div className="bg-primaryColor flex h-full overflow-hidden max-w-svw">
       <ServerListComponent/>
@@ -82,17 +83,25 @@ export default function MainChatPage() {
         <UserProfileComponent/>
       </div>
 
-      <div className="flex flex-col w-full">
+      {channelCheck?<div className="flex flex-col w-full">
         <ChannelHeadComponent setdisplayMemberListComponent={setdisplayMemberListComponent} displayMemberListComponent={displayMemberListComponent}/>
         <div className="flex w-full overflow-hidden h-full">
           <ChatBoxComponent userId={userId}/>
           <MemberListComponent displayMemberListComponent={displayMemberListComponent}/>
         </div>
-        
-      </div>
+      </div>:<NoChannel/>}
+
     </div>
   )
-  }
+  
+}
+
+function NoChannel(){
+  return(
+    <div className="flex w-full">
+      <div className="flex m-auto text-[69px] font-semibold text-otherColor/70 italic underline cursor-pointer hover:text-otherColor duration-300">No Text Channel Available</div>
+    </div>
+  )
 }
 
 

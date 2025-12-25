@@ -8,7 +8,8 @@
 - ~~check auth logic~~ 
 - ~~username cache update~~
 - ~~pfp change cache update~~
-- server change name / leave server / delete channel
+- server change name / leave server / delete channel / delete server
+- add deleted flag in all later delete slowly 
 - add friends system
 - private message
 - voip in server / dms
@@ -22,5 +23,5 @@
 > ### frontend TODO
 - fix ui
 - ~~user update event bus~~
-- server changes event bus~~
+- ~~server changes event bus~~
 - delete message ui update

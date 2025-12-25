@@ -22,6 +22,8 @@ const server = mongoose.Schema({
     members: [{type:Array}],
     channels :[{type:Array}],
     permissions:[{type:Array}],
+    serverprofileurl:{type:String},
+    isDeleted:{type:Boolean,required:true}
 },{ timestamps: true })
 const serverDataModel = mongoose.model("serverData", server);
 
@@ -31,7 +33,8 @@ const serverChannels = mongoose.Schema({
         createdDate: { type:String,required: true },
         channelId:{type:String,required:true},
         serverId:{type:String,required: true},
-        members: [{type:Array}]
+        members: [{type:Array}],
+        isDeleted:{type:Boolean,required:true}
     },{ timestamps: true })
     
 const serverChannelsDataModel = mongoose.model("serverChannelsData", serverChannels);

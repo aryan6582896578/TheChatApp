@@ -78,9 +78,9 @@ export default function serverV2(app,io,upload,redisClient){
       const adminList = serverData.admins;
       const serverName = serverData.name;
       if (adminList.includes(userId)) {
-        res.json({ adminStatus: true ,serverName:serverName });
+        res.json({ adminStatus: true ,serverName:serverName,serverprofileurl:serverData.serverprofileurl });
       } else {
-        res.json({ adminStatus: false ,serverName:serverName });
+        res.json({ adminStatus: false ,serverName:serverName,serverprofileurl:serverData.serverprofileurl });
       }
     }
   });
@@ -204,6 +204,7 @@ export default function serverV2(app,io,upload,redisClient){
             createdDate: `${currentDate}`,
             channelId: `${channelId}`,
             serverId: `${serverId}`,
+            isDeleted:false,
           });
           const serverMemberList = serverData.members;
           serverMemberList.map(async (x) => {
@@ -217,7 +218,7 @@ export default function serverV2(app,io,upload,redisClient){
             { serverId: `${serverId}` },
             { $push: { channels: `${channelId}` } }
           );
-          const updateData = {type:"MainChatPage",refresh:"serverChannelList"}
+          const updateData = {type:"MainChatPage",refresh:"serverChannelList",update:"created"}
           io.to(`${serverId}`).emit(`${serverId}`,updateData);
           res.json({ status: "channelCreated", channelId: `${channelId}` });
         } else {
@@ -312,7 +313,7 @@ export default function serverV2(app,io,upload,redisClient){
   router.put("/updateServerName/:serverId",checkJwt,async (req, res) => {
       const serverId = req.params.serverId;
       const newServerName= req.body.newName;
-      if (req.validUser && serverId) {
+      if (req.validUser && serverId && newServerName) {
         const serverData = await getServerData(serverId);
         if (serverData) {
           if(serverData.admins.includes(req.userId)){
@@ -331,6 +332,40 @@ export default function serverV2(app,io,upload,redisClient){
             }
           }else{
             res.send({status:"invalidUser"})
+          }
+        }else{
+          res.send({status:"invalidServer"})
+        } 
+      }else{
+        res.send({status:"invalidUser"})
+      }
+    }
+  );
+
+  router.put("/deleteChannel/:serverId/:channelId",checkJwt,async (req, res) => {
+      const serverId = req.params.serverId;
+      const channelId = req.params.channelId;
+      console.log(req.validUser ,serverId , channelId)
+      if (req.validUser && serverId && channelId) {
+        const serverData = await getServerData(serverId);
+        if (serverData) {
+          if(serverData.admins.includes(req.userId) && serverData.channels.includes(channelId)){
+            try {
+              const updateChannel = await serverDataModel.findOneAndUpdate(
+                {"serverId":serverId},
+                { $pull: { channels: `${channelId}` } }
+              )
+              res.send({status:"channelDeleted"})
+              const updateData = {type:"MainChatPage",refresh:"serverChannelList",update:"deleted",channelId:channelId}
+              io.to(`${serverId}`).emit(`${serverId}`,updateData);
+              console.log(`Channel deleted ${channelId} in server ${serverId}`)
+
+            } catch (error) {
+              console.log(error)
+                res.send({status:"internalServerError"})
+            }
+          }else{
+            res.send({status:"invalidChannel"})
           }
         }else{
           res.send({status:"invalidServer"})

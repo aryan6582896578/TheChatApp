@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded",async function (event) {
 
     
     root.render(
-      
       <BrowserRouter>
         <Routes>
 
