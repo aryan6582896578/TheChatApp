@@ -11,7 +11,10 @@ export function MemberListComponent({displayMemberListComponent}){
       const channelMemberList = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${ parms.serverId}/${parms.channelId}/channelMemberList`,{
         withCredentials: true,
       });
-      setmemberListData(Object.entries(channelMemberList.data.usernameList))
+      if(channelMemberList){
+        setmemberListData(Object.entries(channelMemberList.data.usernameList))
+      }
+      
     }   
   }
   useEffect(() => {

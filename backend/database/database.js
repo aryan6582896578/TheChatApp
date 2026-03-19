@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { mongoose, Schema } from "mongoose";
-import { v2 as cloudinary } from 'cloudinary';
-const uri = `mongodb+srv://${process.env.dbUsername}:${process.env.dbPassword}@chatappmerndb.0otjpzl.mongodb.net/DB0?retryWrites=true&w=majority&appName=ChatAppMernDb`
+const uri = `mongodb+srv://${process.env.MongoUsername}:${process.env.MongoPassword}@chatappmerndb.0otjpzl.mongodb.net/?appName=ChatAppMernDb`
 
 async function dbApp() {
   try {
@@ -11,7 +10,8 @@ async function dbApp() {
       }).catch((err) => {
         console.log("errr", err);
       });
-    mongoose.connection.on("error", (err) => {
+    mongoose.connection.on("error", (err) => { 
+      
       logError(err);
     });
   } catch (error) {

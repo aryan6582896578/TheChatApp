@@ -18,27 +18,26 @@ export default function MainChatPage() {
   const userId = useRef(null)
   async function getChannelData() {
     try {
-
       const channelListData = await axios.get(`${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/s/${parms.serverId}/channelList`,{
           withCredentials: true,
         });
+      console.log("getChannelData",channelListData.data)
       if(!userId.current){
         userId.current=channelListData.data.userId;
       }
       if(channelListData.data.status === "userInValid"){
-        
         navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat`)
       }else{
-        const data = Object.keys(channelListData.data.channelList);
-        // console.log(data,"ffff")   
+        const data = Object.keys(channelListData.data.channelList);   
         if (parms.channelId) {
           if (data.includes(parms.channelId)) {
             setchannelCheck(true);
           } else {
-            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);}
-        } else {
-          setchannelCheck(false);
+            navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`)
+          }
+        } else {  
           if (data[0]) {
+            setchannelCheck(true);
             navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}/${data[0]}`);
           }else{
             setchannelCheck(false);
@@ -50,9 +49,15 @@ export default function MainChatPage() {
       console.error(error, "error channel switch");
     }
   }
+  // useEffect(() => {
+  //   getChannelData();
+  //   console.log("inside some effect");
+    
+  // }, [parms.serverId, parms.channelId]);
   useEffect(() => {
     getChannelData();
-  }, [parms.serverId, parms.channelId]);
+    console.log("inside some effect");
+  }, [parms.serverId]);
   useEffect(() => {
     const serverId = parms.serverId;
     socket.on(`${serverId}`,async (serverData)=>{
@@ -70,7 +75,7 @@ export default function MainChatPage() {
     return () => {
       socket.off(`${parms.serverId}`);
     }
-  }, [])
+  }, [parms.serverId])
 
 
   return (

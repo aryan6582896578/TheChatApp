@@ -67,19 +67,8 @@ export default function ChannelListComponent() {
 
   useEffect(() => {
     emitter.on("updateChannelList", (updateData) => {
-     
-      let noChannel = false
-      if(parms.channelId){
-        noChannel=true
-      }else{
-        noChannel=false
-      }
-       console.log(updateData,parms.channelId,noChannel)
       if (updateData.refresh === "serverChannelList") {
         if(updateData.update === "deleted" && parms.channelId === updateData.channelId){
-          navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);
-        }else if(updateData.update === "created" && noChannel===false){
-          console.log("hhhh")
           navigate(`/${import.meta.env.VITE_VERSION_LIVE}/@me/chat/${parms.serverId}`);
         }
         getServerData();
