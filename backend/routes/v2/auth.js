@@ -3,8 +3,11 @@ import { signJwt,verifyJwt,createPasswordHash,checkPasswordHash, } from "../../d
 import { getUserData } from "../../database/managedata.js";
 import { serverChannelsDataModel, serverDataModel, userDataModel } from "../../database/schema/databaseSchema.js";
 import { createCustomId } from "../../database/managedata/customData.js";
+import  { getGoogleAuthUrl, oauth2Client } from "../../auth/googleoauth.js";
+import url from 'url';
 const router = express.Router({ mergeParams: true })
-
+import { google } from 'googleapis';
+import crypto from 'crypto';
 export default function auth(app,io,upload,redisClient){
   async function checkJwt(req, res, next) {
       try {
@@ -20,6 +23,39 @@ export default function auth(app,io,upload,redisClient){
       }
       next();
   }
+// const oauth2Client = new google.auth.OAuth2(
+//   process.env.GoogleClientId,
+//   process.env.GoogleClientSecret,
+//   process.env.GoogleRedirectURL,
+// );
+// const scopes = [
+//   'https://www.googleapis.com/auth/userinfo.email',
+//   'https://www.googleapis.com/auth/userinfo.profile'
+// ];
+  router.get("/google/google-callback",async(req,res)=>{
+    // console.log(req.query)
+    let q = url.parse(req.url, true).query;
+    console.log(q)
+        // let x = await getcc(q.code)
+
+    const { tokens } = await oauth2Client.getToken(q.code);
+    console.log(tokens.access_token);
+const ticket = await oauth2Client.verifyIdToken({
+  idToken: tokens.id_token,
+  audience: process.env.GoogleClientId,
+});
+
+const payload = ticket.getPayload();
+console.log(payload);
+        console.log(q)
+    
+    res.json({"hmm":"ok??"})
+  })
+  router.get("/google/auth",async(req,res)=>{
+    const link = await getGoogleAuthUrl();
+    // res.json({"link":link})
+    res.redirect(link)
+  })
   router.post("/register",checkJwt, async (req, res) => {
     if(req.validUser){
         res.json({ status: "userValid" });

@@ -1,9 +1,17 @@
-import { useNavigate } from "react-router";
+import { redirect, useNavigate } from "react-router";
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="bg-secondaryColor h-full">
         <HomePageNavbar/>
+                <div className="">
+          <button onClick={()=>{
+            // alert("hi")
+             window.location.href = `${import.meta.env.VITE_SERVERURL}${import.meta.env.VITE_VERSION_LIVE}/google/auth`;
+            
+          }} > GOOGLE</button>
+        </div>
     </div>
   );
 }
@@ -25,6 +33,7 @@ function HomePageNavbar() {
                 {document.cookie?navigate(`${import.meta.env.VITE_VERSION_LIVE}/@me/chat`):navigate(`${import.meta.env.VITE_VERSION_LIVE}/login`)}
             }}>{ document.cookie? "Continue":"Login"}</button>
         </div>
+
       </div>
 
     );

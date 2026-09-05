@@ -12,19 +12,22 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.8.0",
-    "cookie": "^1.1.1",
+    "cloudinary": "^2.10.0",
+    "cookie": "^2.0.1",
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "cors": "^2.8.6",
+    "crypto": "^1.0.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "googleapis": "^173.0.0",
     "jsonwebtoken": "^9.0.3",
-    "mongodb": "^7.0.0",
-    "mongoose": "^9.0.1",
-    "multer": "^2.0.2",
-    "redis": "^5.10.0",
-    "server": "^0.0.3",
-    "socket.io": "^4.8.1"
+    "mongodb": "^7.4.0",
+    "mongoose": "^9.7.3",
+    "multer": "^2.2.0",
+    "redis": "^6.1.0",
+    "socket.io": "^4.8.3",
+    "url": "^0.11.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

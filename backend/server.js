@@ -19,8 +19,8 @@ const redisClient = createClient({
     username: 'default',
     password: `${process.env.redisCloudPassword}`,
     socket: {
-        host: 'redis-16940.crce281.ap-south-1-3.ec2.cloud.redislabs.com',
-        port: 16940
+        host: 'redis-16254.c305.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 16254
     }
 });
 redisClient.on('error', err => console.log('Redis Client Error', err));
